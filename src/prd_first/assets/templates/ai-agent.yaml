@@ -1,0 +1,121 @@
+type: ai-agent
+name: AI / Agent 项目
+description: LLM 应用、Agent、prompt 工程、RAG、自动化 AI 工作流。与传统软件不同,这类项目的关键在'评估'和'护栏'。
+fields:
+  # ===== 问题与目标 =====
+  - key: problem
+    label: 问题陈述
+    required: true
+    type: text
+    section: 问题与目标
+    prompt: "这个 AI 应用解决什么问题?为什么用 AI(而非规则/模板)?"
+    why: "AI 不是默认选项。很多'AI 应用'其实用规则就能做。先确认模糊性/创造性确实是需求核心。"
+    placeholder: "___ 任务需要理解自然语言/生成内容,传统规则做不好;AI 能 ___。"
+
+  - key: users
+    label: 目标用户
+    required: true
+    type: text
+    section: 问题与目标
+    prompt: "谁用?他们对 AI 输出的容忍度?(能接受偶尔出错吗?)"
+    why: "AI 必然出错。用户对错误的容忍度决定你需要多重的护栏和人工确认环节。"
+
+  - key: goal
+    label: 成功定义
+    required: true
+    type: text
+    section: 问题与目标
+    prompt: "怎样算成功?AI 项目必须给出质量基线(准确率/满意度),不能用'效果不错'糊弄。"
+    why: "AI 项目最大的坑:没有量化标准,永远调不好 prompt。"
+
+  # ===== Agent 设计 =====
+  - key: role
+    label: Agent 角色
+    required: true
+    type: text
+    section: Agent 设计
+    prompt: "这个 Agent/应用扮演什么角色?一句话定位。"
+    why: "角色定位决定 system prompt、能力边界、语气。模糊定位=模糊输出。"
+    placeholder: "一个能 ___ 的助手 / 一个 ___ 自动化 agent"
+
+  - key: input_contract
+    label: 输入契约
+    required: true
+    type: text
+    section: Agent 设计
+    prompt: "用户输入是什么形态?(文本/文件/结构化数据)有哪些字段?"
+    why: "输入契约不清晰,AI 就要'猜',猜错就幻觉。结构化输入比自由文本可靠得多。"
+    placeholder: "自然语言指令 / {task, context, constraints} 结构化 / 上传文件"
+
+  - key: output_contract
+    label: 输出契约
+    required: true
+    type: text
+    section: Agent 设计
+    prompt: "期望输出是什么形态?(纯文本/markdown/JSON/结构化)"
+    why: "输出格式决定下游能否解析。JSON 输出要约束模型,否则容易出非法 JSON。"
+    placeholder: "markdown 报告 / 严格 JSON {field: ...} / 可执行代码"
+
+  - key: tools
+    label: 工具/能力清单
+    required: false
+    type: list
+    section: Agent 设计
+    prompt: "Agent 能调用哪些工具/能力?(function calling / 检索 / 代码执行)"
+    why: "工具清单是 agent 的'手脚'。少则能力弱,多则容易乱用。MVP 先列必需的。"
+    placeholder: "web 搜索 / 读文件 / 执行代码 / 查数据库"
+
+  # ===== 风险与评估(AI 项目核心) =====
+  - key: failure_modes
+    label: 失败模式与降级
+    required: true
+    type: list
+    section: 风险与评估
+    prompt: "会怎么失败?(幻觉/超时/格式错误/越权)失败时怎么降级?"
+    why: "AI 项目不做失败设计 = 上线即事故。必须想清楚降级路径(重试/人工接管/默认值)。"
+    placeholder: "JSON 解析失败 → 重试 1 次 → 报错 / 越权请求 → 拒绝并提示"
+
+  - key: evaluation
+    label: 评估方式
+    required: true
+    type: text
+    section: 风险与评估
+    prompt: "怎么判断做得对?(人工抽检/自动评测集/LLM-as-judge)有没有评测数据?"
+    why: "这是 AI 项目区别于普通项目的关键。没有评估,改 prompt 就是瞎调。"
+    placeholder: "准备 20 条标注样本,跑准确率;改 prompt 后对比基线"
+
+  - key: cost_latency
+    label: 成本与延迟约束
+    required: false
+    type: text
+    section: 风险与评估
+    prompt: "单次调用成本/延迟上限?用哪个模型?"
+    why: "GPT-4 和 GPT-4o 成本差 10x。不设上限,跑几天账单爆表。"
+    placeholder: "单次 < $0.05,延迟 < 10s;用 gpt-4o-mini"
+
+  - key: guardrails
+    label: 安全护栏
+    required: false
+    type: list
+    section: 风险与评估
+    prompt: "需要哪些护栏?(输入过滤/输出审查/越权防护/Prompt 注入防护)"
+    why: "面向用户的 AI 必须防 prompt 注入、敏感信息泄露、越权操作。"
+    placeholder: "输入长度限制 / 输出关键词审查 / 危险操作需确认"
+
+  # ===== 范围 =====
+  - key: non_goals
+    label: 非目标
+    required: true
+    type: list
+    section: 范围
+    prompt: "明确不做哪些?"
+    why: "AI 项目最容易 scope creep('再加个 RAG 吧''再加个 agent')。"
+
+  - key: acceptance
+    label: 验收标准
+    required: true
+    type: list
+    section: 范围
+    prompt: "怎样验收?(必须包含量化质量指标)"
+    why: "AI 验收标准里'准确率达标'比'功能跑通'更重要。"
+    placeholder: "评估集准确率 > 80% / P95 延迟 < 10s / 成本 < $X/千次"

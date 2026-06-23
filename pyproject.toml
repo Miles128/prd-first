@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prd-first"
+version = "0.2.0"
+description = "Vibecoding 前必须先写详尽 PRD 的工具:交互式问答生成结构化 PRD,配合 Skill 在 AI 编码前拦截。"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "sihai" }]
+license = "MIT"
+dependencies = [
+    "typer>=0.9.0",
+    "questionary>=2.0.0",
+    "jinja2>=3.1.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.scripts]
+prd = "prd_first.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+prd_first = ["assets/templates/*.yaml", "assets/templates/*.j2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["prd_first"]
+
+[tool.coverage.report]
+show_missing = true
