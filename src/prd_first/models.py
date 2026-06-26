@@ -5,10 +5,11 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import yaml
 
@@ -142,7 +143,7 @@ class PrdMeta:
             "answers": self.answers,
             "statuses": self.statuses,
         }
-        return yaml.safe_dump(data, allow_unicode=True, sort_keys=False)
+        return cast(str, yaml.safe_dump(data, allow_unicode=True, sort_keys=False))
 
     @classmethod
     def from_yaml(cls, text: str) -> "PrdMeta":
@@ -183,6 +184,7 @@ def list_templates(templates_dir: Optional[Path] = None) -> list[TemplateDef]:
         try:
             data = yaml.safe_load(yaml_path.read_text(encoding="utf-8")) or {}
             result.append(TemplateDef.from_dict(data))
-        except Exception:
+        except (yaml.YAMLError, KeyError, TypeError, FileNotFoundError) as exc:
+            logging.getLogger("prd_first").warning("忽略损坏的模板 %s: %s", yaml_path, exc)
             continue
     return result

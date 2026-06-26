@@ -16,14 +16,14 @@ __all__ = [
     "PACKAGE_ROOT",
 ]
 
-# PRD 文件布局(在项目根目录下的 .prd/)
-PRD_DIR_NAME = ".prd"
+# PRD 文件布局(在项目根目录下的 documents/prd/)
+PRD_DIR_NAME = "documents/prd"
 PRD_FILE_NAME = "PRD.md"
 META_FILE_NAME = "meta.yaml"
 
 # 问答控制 token（用户输入）
-SKIP_TOKEN = "s"
-QUIT_TOKEN = "q"
+SKIP_TOKEN = "s"  # nosec: B105
+QUIT_TOKEN = "q"  # nosec: B105
 
 # 内部哨兵值（函数间传递跳过信号）
 SKIP_SENTINEL = "__PRD_SKIP__"

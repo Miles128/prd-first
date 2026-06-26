@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from prd_first.models import FieldDef, PrdMeta, TemplateDef
 from prd_first.render import render_prd
 

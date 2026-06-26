@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Optional
 
-from jinja2 import Environment, FileSystemLoader, StrictUndefined
+from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
 from .const import TEMPLATES_DIR
 from .models import FieldDef, PrdMeta, TemplateDef
@@ -37,6 +37,7 @@ def render_prd(
         keep_trailing_newline=True,
         trim_blocks=True,
         lstrip_blocks=True,
+        autoescape=select_autoescape(enabled_extensions=("j2", "html", "xml")),
     )
     # 模板文件名:<type>.md.j2;若不存在则回退到 _generic.md.j2
     specific = d / f"{template.type}.md.j2"

@@ -8,21 +8,21 @@
 
 from __future__ import annotations
 
-from typing import Any, Union
+from typing import Any, Union, cast
 
 import questionary
+from rich.console import Console
 
 from .const import QUIT_TOKEN, SKIP_SENTINEL, SKIP_TOKEN
 from .models import Answer, FieldDef, PrdMeta
 
 # 共享 Console 实例
-_console = None
+_console: Console | None = None
 
 
-def _get_console():
+def _get_console() -> Console:
     global _console
     if _console is None:
-        from rich.console import Console
         _console = Console()
     return _console
 
@@ -87,10 +87,10 @@ def ask_text(field: FieldDef, current: Answer) -> str:
         if action == "覆盖重写":
             parts = []
 
-    placeholder = field.placeholder or ""
     first = questionary.text(
         field.prompt,
         default="",
+        instruction=field.placeholder or None,
     ).ask()
     if first is None:
         raise QuitPrompt()
@@ -123,7 +123,6 @@ def ask_text(field: FieldDef, current: Answer) -> str:
 def ask_single(field: FieldDef, current: Answer) -> str:
     """单选。"""
     default = current.value if isinstance(current.value, str) and current.value in field.choices else None
-    choices = list(field.choices)
     # 提供跳过/退出选项
     choices_with_ctrl = list(field.choices) + ["⏭️  跳过本字段", "🚪 退出保存"]
     answer = questionary.select(
@@ -137,21 +136,30 @@ def ask_single(field: FieldDef, current: Answer) -> str:
         return SKIP_SENTINEL
     if answer == "🚪 退出保存":
         raise QuitPrompt()
-    return answer
+    return cast(str, answer)
 
 
 def ask_multi(field: FieldDef, current: Answer) -> list[str]:
     """多选。"""
     default = current.value if isinstance(current.value, (list, tuple)) else []
     choices = list(field.choices)
+    # 提供跳过/退出选项
+    choices_with_ctrl = choices + ["⏭️  跳过本字段", "🚪 退出保存"]
     answer = questionary.checkbox(
         field.prompt,
-        choices=choices,
-        default=[c for c in default if c in choices],
+        choices=choices_with_ctrl,
+        default=[c for c in default if c in choices],  # type: ignore[arg-type]
     ).ask()
     if answer is None:
         raise QuitPrompt()
-    return answer
+    if "🚪 退出保存" in answer:
+        raise QuitPrompt()
+    if "⏭️  跳过本字段" in answer:
+        return SKIP_SENTINEL  # type: ignore[return-value]
+    # 如果实际选项和控制项都没选,等价于跳过
+    if not answer:
+        return SKIP_SENTINEL  # type: ignore[return-value]
+    return [a for a in answer if a in choices]
 
 
 def ask_confirm(field: FieldDef, current: Answer) -> bool:
@@ -160,7 +168,7 @@ def ask_confirm(field: FieldDef, current: Answer) -> bool:
     answer = questionary.confirm(field.prompt, default=default).ask()
     if answer is None:
         raise QuitPrompt()
-    return answer
+    return cast(bool, answer)
 
 
 def ask_list(field: FieldDef, current: Answer) -> list[str]:

@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from prd_first.models import Answer, FieldDef, PrdMeta, TemplateDef, load_template, list_templates
-from prd_first.const import TEMPLATES_DIR
 
 
 class TestFieldDef:

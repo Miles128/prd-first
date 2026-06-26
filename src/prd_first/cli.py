@@ -123,7 +123,7 @@ def init(
         None, help="项目类型,如 web-app。省略则交互选择。"
     ),
     force: bool = typer.Option(
-        False, "--force", "-f", help="即使已有 PRD 也重新开始(保留已有答案)。"
+        False, "--force", "-f", help="即使已有 PRD 也重新开始(保留与新模板同 key 的已填答案)。"
     ),
 ):
     """交互式初始化 PRD:选类型 → 逐字段问答 → 生成 PRD.md。"""
@@ -143,8 +143,15 @@ def init(
             meta = PrdMeta.new(template.type)
             storage.save_meta(meta)
         else:
-            # --force: 重置 meta 但保留已有答案
+            # --force: 重置 meta 但保留与新模板同 key 的已填答案
             meta = PrdMeta.new(template.type)
+            for field in template.fields:
+                key = field.key
+                if (
+                    key in existing.answers
+                    and existing.statuses.get(key) == "answered"
+                ):
+                    meta.set_answer(key, existing.answers[key], status="answered")
             storage.save_meta(meta)
 
     interrupted = _run_questions(template, meta)

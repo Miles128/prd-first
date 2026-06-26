@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from prd_first.checker import CheckResult, check
-from prd_first.models import Answer, FieldDef, PrdMeta, TemplateDef
+from prd_first.models import FieldDef, PrdMeta, TemplateDef
 
 
 def _make_template(fields: list[dict]) -> TemplateDef:
