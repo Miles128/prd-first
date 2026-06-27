@@ -57,18 +57,18 @@ prd template list
 帮我做个 todo 应用
 ```
 
-AI 会自动检测 `.prd/PRD.md` 是否存在，没有就引导你走问答流程。
+AI 会自动检测 `documents/prd/PRD.md` 是否存在，没有就引导你走问答流程。
 
 ### Cursor
 
 在 `.cursor/rules/` 中添加 prd-first 的 SKILL.md 内容，或直接告诉 AI：
 
-> 先检查 .prd/PRD.md，没有就用 prd init 生成
+> 先检查 documents/prd/PRD.md，没有就用 prd init 生成
 
 ## 工作流
 
 ```
-prd init → 交互式问答 → 生成 .prd/PRD.md + .prd/meta.yaml
+prd init → 交互式问答 → 生成 documents/prd/PRD.md + documents/prd/meta.yaml
     ↓
 AI 编程助手读取 PRD → 按范围/非目标/验收标准编码
     ↓

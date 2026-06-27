@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from prd_first import storage
 from prd_first.models import PrdMeta
@@ -66,7 +67,7 @@ class TestMetaOperations:
 
     def test_save_load_roundtrip(self, tmp_path: Path):
         meta = PrdMeta.new("web-app")
-        meta.set_answer("problem", "test problem")
+        meta.set("problem", "test problem")
         storage.save_meta(meta, tmp_path)
         loaded = storage.load_meta(tmp_path)
         assert loaded is not None

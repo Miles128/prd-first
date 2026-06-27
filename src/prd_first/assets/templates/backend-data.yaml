@@ -1,123 +1,63 @@
 type: backend-data
 name: 后端 / 数据管道
-description: API 服务、数据处理管道、定时任务、ETL、系统集成。核心是数据流、容错、可观测性。
+description: API 服务、数据处理管道、定时任务、ETL、系统集成。
 fields:
-  # ===== 问题与目标 =====
   - key: problem
     label: 问题陈述
     required: true
     type: text
-    section: 问题与目标
-    prompt: "这个后端/数据任务解决什么问题?是 API 服务还是离线管道?"
-    why: "在线 API 和离线管道的设计哲学完全不同(延迟 vs 吞吐)。先分清。"
-    placeholder: "需要把 ___ 数据从 ___ 同步到 ___ / 提供 ___ 查询 API"
+    prompt: "这个后端/数据任务解决什么问题?"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
-    section: 问题与目标
     prompt: "怎样算成功?(吞吐量/延迟/正确率/SLA)"
-    why: "后端/数据项目的成功标准必须是量化的,否则没法做容量规划和告警阈值。"
-    placeholder: "日处理 100 万条 / P99 延迟 < 200ms / 数据一致性 100%"
 
-  # ===== 数据流 =====
   - key: sources
     label: 数据来源
     required: true
     type: list
-    section: 数据流
-    prompt: "数据从哪来?(数据库/API/文件/消息队列/用户请求)"
-    why: "数据源决定拉取/推送方式、认证、限流处理。"
-    placeholder: "PostgreSQL 主库 / 第三方 REST API / S3 文件 / Kafka topic"
+    prompt: "数据从哪来?(数据库/API/文件/消息队列)"
 
   - key: data_flow
-    label: 数据流图(文字)
+    label: 数据流
     required: true
     type: text
-    section: 数据流
-    prompt: "数据怎么流动?(源 → 处理 → 存储 → 输出,用文字描述)"
-    why: "数据流图是后端/管道项目的核心架构。画不清楚,实现一定乱。"
-    placeholder: "API 拉取 → 清洗 → 写入 DW → 每日聚合 → 推送到报表"
+    prompt: "数据怎么流动?(源 → 处理 → 存储 → 输出)"
 
-  - key: storage
-    label: 存储方案
-    required: false
-    type: text
-    section: 数据流
-    prompt: "数据存在哪?用哪种存储?(关系库/列存/对象存储/缓存)"
-    why: "存储选型决定查询能力、成本、扩展性。选错了迁移成本极高。"
-    placeholder: "热数据 PostgreSQL / 冷数据 S3 + Parquet / 缓存 Redis"
-
-  - key: schema
-    label: 数据模型/Schema
-    required: false
-    type: text
-    section: 数据流
-    prompt: "核心数据实体/schema?(表结构/消息格式/API DTO)"
-    why: "schema 是系统间的契约。没定清楚,上下游联调灾难。"
-
-  # ===== 依赖与集成 =====
-  - key: external_deps
-    label: 外部依赖
+  - key: scope
+    label: MVP 范围
     required: true
     type: list
-    section: 依赖与集成
-    prompt: "依赖哪些外部系统/服务?(它们挂了会怎样?)"
-    why: "外部依赖是故障源头。必须列清楚,才能设计降级和重试。"
-    placeholder: "第三方支付 API / 上游 Kafka / 下游数据仓库"
+    prompt: "第一版要覆盖哪些数据源和处理步骤?"
 
-  - key: trigger
-    label: 触发方式
-    required: false
-    type: single
-    section: 依赖与集成
-    choices: ["定时(cron)", "事件驱动(消息队列/webhook)", "HTTP 请求", "手动触发", "混合", "待定"]
-    prompt: "任务怎么触发?"
-    why: "触发方式决定部署形态(serverless/常驻/cron job)。"
-
-  # ===== 可靠性 =====
-  - key: fault_tolerance
-    label: 容错策略
-    required: true
-    type: text
-    section: 可靠性
-    prompt: "出错怎么办?(重试/死信队列/降级/熔断)"
-    why: "后端系统 90% 的代码在处理'出错时怎么办'。不提前设计,线上必出事。"
-    placeholder: "失败重试 3 次(指数退避) → 进死信队列 → 告警人工处理"
-
-  - key: idempotency
-    label: 重试与幂等
-    required: false
-    type: text
-    section: 可靠性
-    prompt: "重试时如何保证幂等?(重复执行不会产生副作用)"
-    why: "幂等是可靠重试的前提。不幂等的重试会导致数据重复/重复扣款。"
-    placeholder: "用唯一 request_id 去重 / upsert 替代 insert / 幂等键"
-
-  - key: observability
-    label: 监控与告警
-    required: true
-    type: list
-    section: 可靠性
-    prompt: "监控哪些指标?什么情况告警?"
-    why: "没有可观测性的系统 = 黑盒。出了问题不知道,用户先发现。"
-    placeholder: "吞吐量 / 错误率 / 延迟 / 队列堆积;错误率 > 1% 告警"
-
-  # ===== 范围 =====
   - key: non_goals
     label: 非目标
     required: true
     type: list
-    section: 范围
     prompt: "明确不做哪些?"
-    why: "后端项目最容易'顺手加个缓存层''顺手加个管理后台'。"
+
+  - key: external_deps
+    label: 外部依赖
+    required: true
+    type: list
+    prompt: "依赖哪些外部系统/服务?它们挂了会怎样?"
+
+  - key: fault_tolerance
+    label: 容错策略
+    required: true
+    type: text
+    prompt: "出错怎么办?(重试/死信队列/降级/熔断)"
+
+  - key: tech_stack
+    label: 技术栈
+    required: true
+    type: text
+    prompt: "用什么语言/框架/数据库/消息队列?"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
-    section: 范围
-    prompt: "怎样验收?(包括可靠性验收:故障注入、重放测试)"
-    why: "后端验收必须包含'出错场景',不能只测 happy path。"
-    placeholder: "正常流程跑通 / 模拟上游超时能正确重试 / 重复请求幂等 / 监控指标可见"
+    prompt: "怎样验收?(包括出错场景)"

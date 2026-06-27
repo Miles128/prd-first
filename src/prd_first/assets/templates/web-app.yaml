@@ -1,143 +1,58 @@
 type: web-app
 name: Web 应用
-description: 前端页面、全栈服务、带用户界面的应用。包括 SaaS、管理后台、内容站点、内部工具等。
+description: 前端页面、全栈服务、带用户界面的应用。
 fields:
-  # ===== 问题与目标 =====
   - key: problem
     label: 问题陈述
     required: true
     type: text
-    section: 问题与目标
-    prompt: "这个项目要解决什么问题?为什么现在做?"
-    why: "模糊的'我想做个 X'是方向跑偏的最大根源。先把痛点说清楚,后面所有决策才有锚点。"
-    placeholder: "目标用户在 ___ 场景下遇到 ___ 困难;现有方案 ___ 不好;本项目要 ___。"
+    prompt: "这个项目要解决什么问题?"
 
   - key: users
     label: 目标用户
     required: true
     type: text
-    section: 问题与目标
-    prompt: "谁会用?他们的技术水平、使用频率、使用场景?"
-    why: "交互复杂度、术语选择、默认值,都取决于用户画像。技术小白和开发者要的完全是两个东西。"
-    placeholder: "主要用户:___;技术水平:___;使用频率:每天/每周/偶尔;场景:___"
+    prompt: "谁会用?他们的技术水平和使用场景?"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
-    section: 问题与目标
-    prompt: "做完了怎样算成功?给一个可验证的标准。"
-    why: "没有成功标准 = 永远做不完。MVP 该砍什么,全靠这个标准判断。"
-    placeholder: "用户能完成 ___ 流程;响应时间 < ___;支持 ___ 并发;___ 时间内做出 demo"
+    prompt: "做完了怎样算成功?给一个可验证标准。"
 
-  # ===== 范围 =====
   - key: scope
     label: MVP 范围
     required: true
     type: list
-    section: 范围
     prompt: "MVP 要包含哪些功能?(逐条输入,空行结束)"
-    why: "明确列出'做什么'比列'不做什么'更能防止 scope creep。"
-    placeholder: "用户注册登录 / ___ / ___"
 
   - key: non_goals
-    label: 非目标(明确不做)
+    label: 非目标
     required: true
     type: list
-    section: 范围
-    prompt: "明确不做什么?(常见的诱惑,要写下来挡住)"
-    why: "非目标清单是 vibecoding 最重要的护栏。AI 容易'顺手'加功能,这清单让你理直气壮拒绝。"
-    placeholder: "不做支付 / 不做后台管理 / 不做多租户 / 不做 SEO"
+    prompt: "明确不做什么?(挡住 scope creep)"
 
-  - key: core_scenarios
-    label: 核心场景
-    required: true
-    type: list
-    section: 范围
-    prompt: "用户最常走的 2-3 条路径是什么?按重要性排序。"
-    why: "核心场景决定优先级。80% 精力要花在前 20% 路径上。"
-    placeholder: "1. 新用户首次打开 → 看到 ___ → 完成 ___ / 2. ___"
-
-  # ===== 设计与交互 =====
   - key: pages
     label: 页面结构
     required: true
     type: list
-    section: 设计与交互
-    prompt: "需要哪些页面/路由?(列出页面名 + 一句话职责)"
-    why: "页面清单是前端开发的骨架,直接决定路由和数据流设计。"
-    placeholder: "/ 首页 - 展示 ___ / /dashboard - ___ / /settings - ___"
-
-  - key: user_flows
-    label: 用户流
-    required: false
-    type: text
-    section: 设计与交互
-    prompt: "描述 1-2 个核心用户流的步骤(从进入到完成)。"
-    why: "用户流比页面清单更细,能发现遗漏的状态和边界。"
-    placeholder: "用户点 ___ → 跳转 ___ → 填表 ___ → 提交后 ___"
+    prompt: "需要哪些页面/路由?"
 
   - key: auth
     label: 认证方式
     required: false
     type: single
-    section: 设计与交互
-    choices: ["无认证", "邮箱密码", "第三方 OAuth(Google/GitHub等)", "SSO/企业", "Magic Link", "待定"]
+    choices: ["无认证", "邮箱密码", "OAuth(Google/GitHub)", "SSO/企业"]
     prompt: "需要登录吗?用哪种认证?"
-    why: "认证方式影响数据模型、API 设计、第三方依赖,是早期必须定的架构决策。"
 
-  # ===== 数据与接口 =====
-  - key: data_model
-    label: 数据模型
-    required: false
-    type: text
-    section: 数据与接口
-    prompt: "核心数据实体有哪些?各自关键字段?"
-    why: "数据模型是后端的根基。先想清楚实体,API 自然就出来了。"
-    placeholder: "User: id, email, name, created_at\nProject: id, user_id, name, status\n..."
-
-  - key: api
-    label: API 端点
-    required: false
-    type: text
-    section: 数据与接口
-    prompt: "主要 API 端点列表(REST/GraphQL/RPC 都行)。"
-    why: "前后端契约。没列清楚,AI 会随意起名,后期联调灾难。"
-    placeholder: "POST /api/projects - 创建项目\nGET /api/projects - 列表\n..."
-
-  - key: state_mgmt
-    label: 状态管理方案
-    required: false
-    type: single
-    section: 数据与接口
-    choices: ["React useState/context 即可", "Zustand", "Redux Toolkit", "TanStack Query", "Pinia", "其他/待定"]
-    prompt: "前端状态怎么管理?"
-    why: "状态管理选型决定项目结构,改起来成本高,早期就要定。"
-
-  # ===== 工程约束 =====
   - key: tech_stack
-    label: 技术栈约束
+    label: 技术栈
     required: true
     type: text
-    section: 工程约束
-    prompt: "前端/后端/数据库/部署分别用什么?有没有必须用或必须避开的?"
-    why: "技术栈不定,AI 会按它自己的偏好来。明确约束防止后面返工。"
-    placeholder: "前端: Next.js + TypeScript;后端: ___;DB: PostgreSQL;部署: Vercel"
-
-  - key: deploy
-    label: 部署环境
-    required: false
-    type: single
-    section: 工程约束
-    choices: ["Vercel/Netlify", "Docker 自托管", "Cloudflare Workers/Pages", "本地脚本即可", "云服务器", "待定"]
-    prompt: "部署到哪里?"
-    why: "部署目标影响构建方式、环境变量、文件系统假设。"
+    prompt: "前端/后端/数据库/部署分别用什么?"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
-    section: 工程约束
     prompt: "完成时怎样验收?(可勾选的检查项)"
-    why: "验收标准让'做完了'有客观判断,而不是'感觉差不多了'。AI 也靠它判断任务完成。"
-    placeholder: "用户能注册并登录 / 能创建 ___ / 页面加载 < 2s / 移动端可用"

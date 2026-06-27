@@ -11,17 +11,20 @@ requires-python = ">=3.10"
 authors = [{ name = "sihai" }]
 license = "MIT"
 dependencies = [
-    "typer>=0.9.0",
-    "questionary>=2.0.0",
-    "jinja2>=3.1.0",
-    "pyyaml>=6.0",
-    "rich>=13.0.0",
+    "typer>=0.9.0,<1.0",
+    "questionary>=2.0.0,<3.0",
+    "jinja2>=3.1.0,<4.0",
+    "pyyaml>=6.0,<7.0",
+    "rich>=13.0.0,<14.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "bandit>=1.7.0",
 ]
 
 [project.scripts]
@@ -31,7 +34,7 @@ prd = "prd_first.cli:app"
 where = ["src"]
 
 [tool.setuptools.package-data]
-prd_first = ["assets/templates/*.yaml", "assets/templates/*.j2"]
+prd_first = ["assets/templates/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -48,3 +51,10 @@ python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]

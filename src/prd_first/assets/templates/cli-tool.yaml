@@ -1,113 +1,57 @@
 type: cli-tool
-name: CLI / 脚本工具
-description: 命令行工具、脚本、自动化任务。包括 dev tooling、数据处理脚本、CI 辅助、一次性迁移等。
+name: CLI 工具
+description: 命令行工具、脚本、自动化任务。
 fields:
-  # ===== 问题与目标 =====
   - key: problem
     label: 问题陈述
     required: true
     type: text
-    section: 问题与目标
-    prompt: "这个工具解决什么问题?为什么用 CLI 而不是别的形式?"
-    why: "CLI 不是万能的。先确认'命令行重复操作'确实是核心痛点,否则可能做成 GUI 或定时任务更合适。"
-    placeholder: "每次做 ___ 都要手动 ___ 步,容易出错;自动化成一条命令。"
+    prompt: "这个工具解决什么问题?为什么用 CLI?"
 
   - key: users
     label: 目标用户
     required: true
     type: text
-    section: 问题与目标
     prompt: "谁会用?他们熟悉命令行吗?"
-    why: "给开发者用 vs 给非技术用户用,提示语、错误信息、安装方式完全不同。"
-    placeholder: "开发者,熟悉终端 / 或:非技术运营,需要简单说明"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
-    section: 问题与目标
-    prompt: "怎样算成功?给可验证标准(速度、正确率、使用频率)。"
-    why: "CLI 工具尤其需要明确的'做完了',否则容易无限加子命令。"
-    placeholder: "把 5 分钟操作压到 10 秒 / 准确率 100% / 团队每周用 N 次"
+    prompt: "怎样算成功?给可验证标准。"
 
-  # ===== 范围 =====
   - key: commands
     label: 命令结构
     required: true
     type: list
-    section: 范围
-    prompt: "有哪些子命令/参数/选项?(逐条列出,格式:命令 用法 - 说明)"
-    why: "命令结构是 CLI 的 API。不先定好,后期加命令容易破坏既有用法。"
-    placeholder: "init [type] - 初始化 / run <name> - 执行 / list - 列出"
+    prompt: "有哪些子命令?(格式:命令 说明)"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
-    section: 范围
     prompt: "第一版必须有哪些命令/能力?"
-    why: "CLI 工具最忌讳一上来想做全套。先做最小可用的那条命令。"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
-    section: 范围
-    prompt: "明确不做哪些?(常见的诱惑)"
-    why: "挡住'顺手加个 GUI''顺手加配置文件管理'这类跑偏。"
+    prompt: "明确不做哪些?"
 
-  # ===== 接口契约 =====
   - key: input
     label: 输入格式
     required: true
     type: text
-    section: 接口契约
-    prompt: "输入从哪来?(参数 / stdin / 文件 / 配置文件 / 环境变量)"
-    why: "输入来源决定参数解析、文件读取、错误处理逻辑。"
-    placeholder: "位置参数 + --option 选项 + stdin 管道 / 配置文件 ~/.xxx"
+    prompt: "输入从哪来?(参数/stdin/文件/配置)"
 
-  - key: output
-    label: 输出格式
+  - key: tech_stack
+    label: 技术栈
     required: true
     type: text
-    section: 接口契约
-    prompt: "输出到哪?什么格式?(stdout/stderr/文件;human/json/csv)"
-    why: "输出格式决定能否被管道衔接。--format json 这类约定要早定。"
-    placeholder: "默认人类可读表格,--format json 机器可读;错误进 stderr"
-
-  - key: exit_codes
-    label: 退出码约定
-    required: false
-    type: text
-    section: 接口契约
-    prompt: "退出码怎么约定?(0 成功,非 0 各类失败)"
-    why: "退出码是脚本编排( && / 管道)的契约。约定清楚才能被 CI 调用。"
-    placeholder: "0 成功 / 1 参数错误 / 2 运行时错误 / 3 未找到资源"
-
-  # ===== 工程约束 =====
-  - key: dependencies
-    label: 依赖项
-    required: true
-    type: text
-    section: 工程约束
-    prompt: "用什么语言/框架?有哪些外部依赖?能否零依赖?"
-    why: "CLI 工具的依赖越少越好装。Python CLI 要考虑是否值得为一个小功能引入大库。"
-    placeholder: "Python + typer;或 Rust 零依赖;或纯 bash"
-
-  - key: distribution
-    label: 安装分发方式
-    required: false
-    type: single
-    section: 工程约束
-    choices: ["pip / pipx", "npm", "homebrew", "cargo install", "单文件脚本直接跑", "docker", "待定"]
-    prompt: "用户怎么安装?"
-    why: "分发方式影响项目结构(是否打包、入口点怎么定义)。"
+    prompt: "用什么语言/框架?有哪些外部依赖?"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
-    section: 工程约束
-    prompt: "怎样验收?(可勾选的检查项)"
-    why: "CLI 的验收要包括'管道衔接'和'错误退出码'这类容易被忽略的契约。"
-    placeholder: "命令能跑通 / --help 清晰 / 错误进 stderr 退出非 0 / 能被管道调用"
+    prompt: "怎样验收?(包括管道调用和退出码)"
