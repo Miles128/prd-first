@@ -7,51 +7,102 @@ fields:
     required: true
     type: text
     prompt: "这个工具解决什么问题?为什么用 CLI?"
+    drill_questions:
+      - "这个 CLI 解决的是一次性任务还是反复执行的工作流？"
+      - "用户现在用脚本/手动/其他工具怎么做的？"
+      - "不做这个 CLI 的最坏结果是什么？"
 
   - key: users
     label: 目标用户
     required: true
     type: text
     prompt: "谁会用?他们熟悉命令行吗?"
+    drill_questions:
+      - "用户是开发者、运维还是非技术人员？"
+      - "他们会在本地、CI 还是容器里运行？"
+      - "用户对错误信息的可读性要求有多高？"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "怎样算成功?给可验证标准。"
+    drill_questions:
+      - "成功标准是可量化的吗？例如节省多少时间、减少多少错误？"
+      - "如何验证用户真的觉得好用？"
 
   - key: commands
     label: 命令结构
     required: true
     type: list
     prompt: "有哪些子命令?(格式:命令 说明)"
+    drill_questions:
+      - "子命令、参数、标志的命名是否符合用户心智模型？"
+      - "是否有破坏性命令需要二次确认？"
+      - "命令之间是否有共享状态或配置文件？"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "第一版必须有哪些命令/能力?"
+    drill_questions:
+      - "第一个版本最少需要几个命令？"
+      - "哪些功能可以留到后续版本？"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做哪些?"
+    drill_questions:
+      - "会不会有用户把这个 CLI 当服务端用？需要明确禁止吗？"
+      - "哪些平台/环境明确不支持？"
 
   - key: input
     label: 输入格式
     required: true
     type: text
     prompt: "输入从哪来?(参数/stdin/文件/配置)"
+    drill_questions:
+      - "输入来源是文件、stdin、参数还是环境变量？"
+      - "输入无效时如何报错？错误信息包含哪些字段？"
+      - "是否需要支持流式输入？"
+
+  - key: output
+    label: 输出格式
+    required: false
+    type: text
+    prompt: "默认输出什么格式?是否需要 JSON/CSV 等机器可读格式?"
+    drill_questions:
+      - "默认输出是人类可读还是机器可读？"
+      - "是否需要 JSON/CSV/YAML 等结构化输出开关？"
+      - "输出中的敏感信息如何脱敏？"
+
+  - key: dependencies
+    label: 依赖项
+    required: false
+    type: list
+    prompt: "有哪些外部依赖?(运行时/可选)"
+    drill_questions:
+      - "哪些是运行时必需，哪些是可选增强？"
+      - "依赖失败时如何降级或提示？"
+      - "是否需要锁定版本？"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "用什么语言/框架?有哪些外部依赖?"
+    drill_questions:
+      - "选择这种语言/框架的最主要原因是什么？"
+      - "依赖的成熟度如何？是否有替代方案？"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
     prompt: "怎样验收?(包括管道调用和退出码)"
+    drill_questions:
+      - "是否有集成测试覆盖主要命令路径？"
+      - "是否测试了错误输入和帮助信息？"

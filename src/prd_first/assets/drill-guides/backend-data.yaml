@@ -1,0 +1,74 @@
+type: backend-data
+name: 后端与数据管道决策树追问指南
+description: |
+  后端项目 90% 的代码在处理失败。本指南重点追问数据流、依赖、容错和监控。
+branches:
+  - key: problem
+    label: 问题陈述
+    drill:
+      - 这个服务/管道解决的核心业务问题是什么？
+      - 它的 SLA 要求是什么？允许多久的停机或延迟？
+
+  - key: goal
+    label: 成功定义
+    drill:
+      - 成功指标是吞吐量、延迟、准确性还是可用性？
+      - 如何持续监控这些指标？
+
+  - key: data_sources
+    label: 数据来源
+    drill:
+      - 数据来源是内部服务、第三方 API、消息队列还是文件？
+      - 数据所有者和 schema 变更通知机制是什么？
+      - 数据是否可能重复、乱序或迟到？
+
+  - key: data_flow
+    label: 数据流图
+    drill:
+      - 画出数据从进入到落盘/输出的每一步。
+      - 每一步失败时数据会丢在哪里？
+      - 是否需要幂等设计？
+
+  - key: external_dependencies
+    label: 外部依赖
+    drill:
+      - 依赖服务的可用性历史如何？是否有 rate limit？
+      - 依赖超时、降级、熔断策略是什么？
+      - 依赖返回不一致数据时怎么办？
+
+  - key: fault_tolerance
+    label: 容错策略
+    drill:
+      - 列出至少 3 种失败场景及处理方式。
+      - 是否需要重试？重试策略是指数退避还是固定间隔？
+      - 死信队列或人工介入的触发条件是什么？
+
+  - key: monitoring
+    label: 监控告警
+    drill:
+      - 监控哪些黄金指标（延迟、错误率、吞吐量、饱和度）？
+      - 告警阈值如何设定？避免狼来了。
+      - 有没有 runbook 对应常见告警？
+
+  - key: non_goals
+    label: 非目标
+    drill:
+      - 哪些数据/功能明确不在本次范围？
+      - 是否承诺了实时性要求？
+
+  - key: acceptance
+    label: 验收标准
+    drill:
+      - 是否有针对失败路径的测试？
+      - 是否能在测试环境模拟依赖故障？
+
+optional_branches:
+  - key: storage
+    label: 存储方案
+    trigger: 当数据量大、有复杂查询或需要长期保留时
+  - key: schema
+    label: Schema 设计
+    trigger: 当涉及关系型数据或多团队协作时
+  - key: triggering
+    label: 触发方式
+    trigger: 当管道是事件驱动、定时任务或 API 触发时

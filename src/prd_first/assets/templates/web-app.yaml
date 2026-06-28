@@ -7,36 +7,60 @@ fields:
     required: true
     type: text
     prompt: "这个项目要解决什么问题?"
+    drill_questions:
+      - "用户现在如何解决这个问题？如果不做这个项目会怎样？"
+      - "这是替代现有方案，还是开辟全新场景？"
+      - "问题的优先级是 P0 还是'有更好'?"
 
   - key: users
     label: 目标用户
     required: true
     type: text
     prompt: "谁会用?他们的技术水平和使用场景?"
+    drill_questions:
+      - "主要用户角色的技术水平和使用频率?"
+      - "是否有非目标用户需要明确排除?"
+      - "用户最痛的三件事是什么?"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "做完了怎样算成功?给一个可验证标准。"
+    drill_questions:
+      - "成功的指标是可量化的吗？如何收集数据？"
+      - "如果一个月后指标没达成，会先怀疑哪个假设？"
+      - "有没有'成功但不可接受'的情况？"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "MVP 要包含哪些功能?(逐条输入,空行结束)"
+    drill_questions:
+      - "如果砍掉一半功能，留下哪一半仍能验证核心价值？"
+      - "每个功能对应的用户场景是什么？"
+      - "哪些功能现在不做，但用户大概率很快会问？"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做什么?(挡住 scope creep)"
+    drill_questions:
+      - "这些非目标是否和用户/利益相关者对齐过？"
+      - "有没有和非目标看起来冲突的需求？"
+      - "如果用户中途要求做非目标里的某一项，怎么回应？"
 
   - key: pages
     label: 页面结构
     required: true
     type: list
     prompt: "需要哪些页面/路由?"
+    drill_questions:
+      - "每个页面的入口和退出路径是什么？"
+      - "页面之间的数据如何流转？"
+      - "是否有权限或角色差异影响页面可见性？"
 
   - key: auth
     label: 认证方式
@@ -44,15 +68,27 @@ fields:
     type: single
     choices: ["无认证", "邮箱密码", "OAuth(Google/GitHub)", "SSO/企业"]
     prompt: "需要登录吗?用哪种认证?"
+    drill_questions:
+      - "选择这种认证方式的核心原因是什么？"
+      - "用户登录失败后有哪些状态？"
+      - "是否需要会话过期、多设备登录等策略？"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "前端/后端/数据库/部署分别用什么?"
+    drill_questions:
+      - "团队对这套栈的熟悉度如何？"
+      - "是否有非功能性约束（合规、部署环境、性能基线）影响选型？"
+      - "如果某个依赖 6 个月后不维护了，替代方案是什么？"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
     prompt: "完成时怎样验收?(可勾选的检查项)"
+    drill_questions:
+      - "每条标准是否可以用自动测试或人工走查验证？"
+      - "验收时需要在什么环境、用什么账号、准备什么数据？"
+      - "有没有'隐形验收标准'（如性能、可访问性、SEO）？"

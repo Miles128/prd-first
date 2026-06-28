@@ -34,7 +34,7 @@ prd = "prd_first.cli:app"
 where = ["src"]
 
 [tool.setuptools.package-data]
-prd_first = ["assets/templates/*.yaml"]
+prd_first = ["assets/templates/*.yaml", "assets/drill-guides/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

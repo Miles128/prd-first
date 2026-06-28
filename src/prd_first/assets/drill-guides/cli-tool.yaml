@@ -1,0 +1,78 @@
+type: cli-tool
+name: CLI 工具决策树追问指南
+description: |
+  把 cli-tool 模板字段当作初始决策树地图，重点追问命令结构、输入输出和失败模式。
+branches:
+  - key: problem
+    label: 问题陈述
+    drill:
+      - 这个 CLI 解决的是一次性任务还是反复执行的工作流？
+      - 用户现在用脚本/手动/其他工具怎么做的？
+      - 不做这个 CLI 的最坏结果是什么？
+
+  - key: users
+    label: 目标用户
+    drill:
+      - 用户是开发者、运维还是非技术人员？
+      - 他们会在本地、CI 还是容器里运行？
+      - 用户对错误信息的可读性要求有多高？
+
+  - key: goal
+    label: 成功定义
+    drill:
+      - 成功标准是可量化的吗？例如节省多少时间、减少多少错误？
+      - 如何验证用户真的觉得好用？
+
+  - key: commands
+    label: 命令结构
+    drill:
+      - 子命令、参数、标志的命名是否符合用户心智模型？
+      - 是否有破坏性命令需要二次确认？
+      - 命令之间是否有共享状态或配置文件？
+
+  - key: scope
+    label: MVP 范围
+    drill:
+      - 第一个版本最少需要几个命令？
+      - 哪些功能可以留到后续版本？
+
+  - key: non_goals
+    label: 非目标
+    drill:
+      - 会不会有用户把这个 CLI 当服务端用？需要明确禁止吗？
+      - 哪些平台/环境明确不支持？
+
+  - key: input
+    label: 输入格式
+    drill:
+      - 输入来源是文件、stdin、参数还是环境变量？
+      - 输入无效时如何报错？错误信息包含哪些字段？
+      - 是否需要支持流式输入？
+
+  - key: output
+    label: 输出格式
+    drill:
+      - 默认输出是人类可读还是机器可读？
+      - 是否需要 JSON/CSV/YAML 等结构化输出开关？
+      - 输出中的敏感信息如何脱敏？
+
+  - key: dependencies
+    label: 依赖项
+    drill:
+      - 哪些是运行时必需，哪些是可选增强？
+      - 依赖失败时如何降级或提示？
+      - 是否需要锁定版本？
+
+  - key: acceptance
+    label: 验收标准
+    drill:
+      - 是否有集成测试覆盖主要命令路径？
+      - 是否测试了错误输入和帮助信息？
+
+optional_branches:
+  - key: exit_codes
+    label: 退出码
+    trigger: 当 CLI 需要被脚本调用时
+  - key: config_file
+    label: 配置文件
+    trigger: 当命令变多或需要保存用户偏好时
