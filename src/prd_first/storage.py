@@ -1,4 +1,10 @@
-"""PRD 文件读写:统一管理 documents/prd/ 目录的持久化。"""
+"""PRD 文件读写:统一管理 documents/prd/ 目录的持久化。
+
+支持多个可能的 PRD 位置,按优先级搜索:
+1. documents/prd/PRD.md (默认)
+2. docs/PRD.md
+3. PRD.md (项目根目录)
+"""
 
 from __future__ import annotations
 
@@ -15,10 +21,54 @@ from .const import (
 )
 from .models import PrdMeta
 
+# PRD 可能存在的位置（按优先级排序）
+PRD_SEARCH_PATHS = [
+    "documents/prd",  # 默认位置
+    "docs",           # 常见文档目录
+    ".",              # 项目根目录
+]
+
+
+def find_prd_dir(root: Path | None = None) -> Path | None:
+    """搜索 PRD 文件可能存在的目录，返回第一个找到的位置。"""
+    base = root or Path.cwd()
+
+    for dir_name in PRD_SEARCH_PATHS:
+        candidate = base / dir_name
+        prd_path = candidate / PRD_FILE_NAME
+        if prd_path.exists():
+            return candidate
+
+    return None
+
+
+def find_meta_dir(root: Path | None = None) -> Path | None:
+    """搜索 meta.yaml 文件可能存在的目录，返回第一个找到的位置。"""
+    base = root or Path.cwd()
+
+    for dir_name in PRD_SEARCH_PATHS:
+        candidate = base / dir_name
+        meta_path = candidate / META_FILE_NAME
+        if meta_path.exists():
+            return candidate
+
+    return None
+
 
 def prd_dir(root: Path | None = None) -> Path:
-    """返回 documents/prd 目录路径。root 默认为当前工作目录。"""
+    """返回 PRD 目录路径。
+
+    如果已存在 PRD 文件，返回其所在目录；
+    否则返回默认的 documents/prd/ 目录。
+    """
     base = root or Path.cwd()
+
+    # 先搜索已存在的 PRD
+    existing = find_prd_dir(root)
+    if existing is not None:
+        return existing
+
+    # 不存在则使用默认位置
     return base / PRD_DIR_NAME
 
 
@@ -38,11 +88,13 @@ def ensure_prd_dir(root: Path | None = None) -> Path:
 
 
 def meta_exists(root: Path | None = None) -> bool:
-    return meta_file(root).exists()
+    """检查 meta.yaml 是否存在（搜索多个位置）。"""
+    return find_meta_dir(root) is not None
 
 
 def prd_exists(root: Path | None = None) -> bool:
-    return prd_file(root).exists()
+    """检查 PRD.md 是否存在（搜索多个位置）。"""
+    return find_prd_dir(root) is not None
 
 
 def load_meta(root: Path | None = None) -> PrdMeta | None:

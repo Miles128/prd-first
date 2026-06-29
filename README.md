@@ -9,7 +9,7 @@ prd-first 是一个轻量 CLI + AI Skill，帮你在 AI 开始写业务代码前
 - **快速表单模式**：需求已经清晰，直接 `prd init` 按模板填空。
 - **drill-first 模式**：需求模糊或风险高，让 AI 基于决策树地图逐分支追问，直到共享理解。
 
-无论哪种模式，最终都收敛到 `documents/prd/PRD.md` + `documents/prd/meta.yaml`，作为后续编码、验收、需求变更的唯一事实来源。
+无论哪种模式，最终都收敛到 PRD 文件（按优先级搜索 `documents/prd/PRD.md`、`docs/PRD.md`、`PRD.md`）+ `meta.yaml`，作为后续编码、验收、需求变更的唯一事实来源。
 
 ## 为什么需要 prd-first
 
@@ -138,7 +138,7 @@ prd edit goal
 帮我做个 todo 应用
 ```
 
-AI 会自动检测 `documents/prd/PRD.md` 是否存在。没有则进入 drill-first 流程，有则按 PRD 编码。
+AI 会自动检测 PRD 文件是否存在（按优先级搜索 `documents/prd/PRD.md`、`docs/PRD.md`、`PRD.md`）。没有则进入 drill-first 流程，有则按 PRD 编码。
 
 ## 设计原则
 

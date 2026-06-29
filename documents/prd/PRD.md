@@ -28,7 +28,7 @@ prd-first 是一个 Vibecoding 前的规划拦截工具。它通过 CLI + AI Ski
 - Skill 模式下，AI 能基于模板做决策树地图，逐个分支追问到共享理解。
 - 用户偏离模板时，AI 能动态添加新分支而不是拒绝或生硬拉回。
 - CLI 零 LLM 依赖，原有 `prd init / check / show` 流程 100% 兼容。
-- 所有结论收敛到 `documents/prd/PRD.md` + `documents/prd/meta.yaml`。
+- 所有结论收敛到 PRD 文件（按优先级搜索 `documents/prd/PRD.md`、`docs/PRD.md`、`PRD.md`）+ `meta.yaml`。
 - 编码期间能持续回引 PRD 的范围、非目标和验收标准。
 
 ## 范围
