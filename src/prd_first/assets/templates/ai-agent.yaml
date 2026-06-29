@@ -7,57 +7,112 @@ fields:
     required: true
     type: text
     prompt: "这个 AI 应用解决什么问题?为什么用 AI?"
+    drill_questions:
+      - "这个 Agent 替代的是人工判断还是已有自动化？"
+      - "错误代价有多高？是'推荐错一首歌'还是'转账错误'?"
+      - "不做 Agent，用规则引擎能否先解决 80%?"
 
   - key: users
     label: 目标用户
     required: true
     type: text
     prompt: "谁用?他们对 AI 输出的容忍度?"
+    drill_questions:
+      - "最终用户是直接和 Agent 对话，还是消费 Agent 的输出？"
+      - "用户对延迟的容忍度是多少？"
+      - "用户能否介入修正 Agent 的决策？"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "怎样算成功?给出量化质量基线。"
+    drill_questions:
+      - "成功指标必须是可量化的，例如准确率、召回率、用户满意度。"
+      - "指标如何收集？是否有人工标注流程？"
+      - "达到多少分算上线？多少分算撤回？"
 
   - key: role
     label: Agent 角色
     required: true
     type: text
     prompt: "这个 Agent 扮演什么角色?一句话定位。"
+    drill_questions:
+      - "Agent 的角色设定会如何影响它的回答风格和行为边界？"
+      - "角色和能力是否匹配？会不会让用户产生错误预期？"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "第一版 Agent 要具备哪些能力?"
+    drill_questions:
+      - "第一版最少需要哪些能力才能验证核心价值？"
+      - "哪些能力看起来诱人但应该留到后续版本？"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做哪些?"
+    drill_questions:
+      - "哪些能力明确不做，以免用户误用？"
+      - "是否有合规或伦理红线？"
+
+  - key: input_contract
+    label: 输入契约
+    required: false
+    type: text
+    prompt: "Agent 接收什么输入?格式、长度、来源限制?"
+    drill_questions:
+      - "输入的来源、格式、长度限制是什么？"
+      - "输入是否包含敏感信息？如何脱敏或授权？"
+      - "输入缺失必填字段时怎么办？"
+
+  - key: output_contract
+    label: 输出契约
+    required: false
+    type: text
+    prompt: "Agent 输出什么?结构化数据/自然语言/动作调用?"
+    drill_questions:
+      - "输出是结构化数据、自然语言还是动作调用？"
+      - "下游系统如何消费输出？有没有 schema 约束？"
+      - "输出需要附带置信度或解释吗？"
 
   - key: evaluation
     label: 评估方式
     required: true
     type: text
     prompt: "怎么判断做得对?有没有评测数据?"
+    drill_questions:
+      - "评估数据集从哪里来？是否覆盖边缘 case？"
+      - "用自动化指标还是人工评估？各占多少？"
+      - "评估频率是每次改动、每日还是每周？"
 
   - key: failure_modes
     label: 失败模式与降级
     required: true
     type: list
     prompt: "会怎么失败?失败时怎么降级?"
+    drill_questions:
+      - "列出至少 3 种典型失败模式及对应的降级策略。"
+      - "Agent 拒绝回答和答错，哪个更危险？"
+      - "是否需要人工审核回路？触发条件是什么？"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "用什么模型/框架/外部服务?"
+    drill_questions:
+      - "选择这个模型的核心原因是什么？是否有成本或延迟约束？"
+      - "如果模型服务商调整接口或涨价，切换成本有多大？"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
     prompt: "怎样验收?(必须包含量化指标)"
+    drill_questions:
+      - "是否有端到端测试覆盖主路径？"
+      - "是否定义了坏 case 的上限？"

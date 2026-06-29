@@ -7,57 +7,101 @@ fields:
     required: true
     type: text
     prompt: "这个后端/数据任务解决什么问题?"
+    drill_questions:
+      - "这个服务/管道解决的核心业务问题是什么？"
+      - "它的 SLA 要求是什么？允许多久的停机或延迟？"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "怎样算成功?(吞吐量/延迟/正确率/SLA)"
+    drill_questions:
+      - "成功指标是吞吐量、延迟、准确性还是可用性？"
+      - "如何持续监控这些指标？"
 
   - key: sources
     label: 数据来源
     required: true
     type: list
     prompt: "数据从哪来?(数据库/API/文件/消息队列)"
+    drill_questions:
+      - "数据来源是内部服务、第三方 API、消息队列还是文件？"
+      - "数据所有者和 schema 变更通知机制是什么？"
+      - "数据是否可能重复、乱序或迟到？"
 
   - key: data_flow
     label: 数据流
     required: true
     type: text
     prompt: "数据怎么流动?(源 → 处理 → 存储 → 输出)"
+    drill_questions:
+      - "画出数据从进入到落盘/输出的每一步。"
+      - "每一步失败时数据会丢在哪里？"
+      - "是否需要幂等设计？"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "第一版要覆盖哪些数据源和处理步骤?"
+    drill_questions:
+      - "第一版最少需要覆盖哪些数据源和处理步骤？"
+      - "哪些复杂场景可以留到后续版本？"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做哪些?"
+    drill_questions:
+      - "哪些数据/功能明确不在本次范围？"
+      - "是否承诺了实时性要求？"
 
   - key: external_deps
     label: 外部依赖
     required: true
     type: list
     prompt: "依赖哪些外部系统/服务?它们挂了会怎样?"
+    drill_questions:
+      - "依赖服务的可用性历史如何？是否有 rate limit？"
+      - "依赖超时、降级、熔断策略是什么？"
+      - "依赖返回不一致数据时怎么办？"
 
   - key: fault_tolerance
     label: 容错策略
     required: true
     type: text
     prompt: "出错怎么办?(重试/死信队列/降级/熔断)"
+    drill_questions:
+      - "列出至少 3 种失败场景及处理方式。"
+      - "是否需要重试？重试策略是指数退避还是固定间隔？"
+      - "死信队列或人工介入的触发条件是什么？"
+
+  - key: monitoring
+    label: 监控告警
+    required: false
+    type: text
+    prompt: "需要监控哪些指标?告警阈值怎么设?"
+    drill_questions:
+      - "监控哪些黄金指标（延迟、错误率、吞吐量、饱和度）？"
+      - "告警阈值如何设定？避免狼来了。"
+      - "有没有 runbook 对应常见告警？"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "用什么语言/框架/数据库/消息队列?"
+    drill_questions:
+      - "这套技术栈在满足吞吐量和延迟要求上是否有先例？"
+      - "团队对运维这套栈的熟悉度如何？"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
     prompt: "怎样验收?(包括出错场景)"
+    drill_questions:
+      - "是否有针对失败路径的测试？"
+      - "是否能在测试环境模拟依赖故障？"

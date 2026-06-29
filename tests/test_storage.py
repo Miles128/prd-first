@@ -19,12 +19,79 @@ def tmp_prd_dir(tmp_path: Path):
 
 
 class TestPrdDir:
-    def test_default(self, monkeypatch, tmp_path: Path):
+    def test_default_when_no_prd_exists(self, monkeypatch, tmp_path: Path):
         monkeypatch.chdir(tmp_path)
         assert storage.prd_dir() == tmp_path / "documents" / "prd"
 
-    def test_custom_root(self, tmp_path: Path):
+    def test_custom_root_when_no_prd_exists(self, tmp_path: Path):
         assert storage.prd_dir(tmp_path) == tmp_path / "documents" / "prd"
+
+    def test_finds_prd_in_documents_prd(self, tmp_path: Path):
+        prd = tmp_path / "documents" / "prd"
+        prd.mkdir(parents=True)
+        (prd / "PRD.md").write_text("# PRD", encoding="utf-8")
+        assert storage.prd_dir(tmp_path) == prd
+
+    def test_finds_prd_in_docs(self, tmp_path: Path):
+        docs = tmp_path / "docs"
+        docs.mkdir(parents=True)
+        (docs / "PRD.md").write_text("# PRD", encoding="utf-8")
+        assert storage.prd_dir(tmp_path) == docs
+
+    def test_finds_prd_in_root(self, tmp_path: Path):
+        (tmp_path / "PRD.md").write_text("# PRD", encoding="utf-8")
+        assert storage.prd_dir(tmp_path) == tmp_path
+
+
+class TestFindPrdDir:
+    def test_returns_none_when_no_prd(self, tmp_path: Path):
+        assert storage.find_prd_dir(tmp_path) is None
+
+    def test_finds_in_documents_prd(self, tmp_path: Path):
+        prd = tmp_path / "documents" / "prd"
+        prd.mkdir(parents=True)
+        (prd / "PRD.md").write_text("# PRD", encoding="utf-8")
+        assert storage.find_prd_dir(tmp_path) == prd
+
+    def test_finds_in_docs(self, tmp_path: Path):
+        docs = tmp_path / "docs"
+        docs.mkdir(parents=True)
+        (docs / "PRD.md").write_text("# PRD", encoding="utf-8")
+        assert storage.find_prd_dir(tmp_path) == docs
+
+    def test_finds_in_root(self, tmp_path: Path):
+        (tmp_path / "PRD.md").write_text("# PRD", encoding="utf-8")
+        assert storage.find_prd_dir(tmp_path) == tmp_path
+
+    def test_priority_documents_prd_over_docs(self, tmp_path: Path):
+        # Create PRD in both locations
+        documents_prd = tmp_path / "documents" / "prd"
+        documents_prd.mkdir(parents=True)
+        (documents_prd / "PRD.md").write_text("# PRD", encoding="utf-8")
+        
+        docs = tmp_path / "docs"
+        docs.mkdir(parents=True)
+        (docs / "PRD.md").write_text("# PRD", encoding="utf-8")
+        
+        # Should find documents/prd first
+        assert storage.find_prd_dir(tmp_path) == documents_prd
+
+
+class TestFindMetaDir:
+    def test_returns_none_when_no_meta(self, tmp_path: Path):
+        assert storage.find_meta_dir(tmp_path) is None
+
+    def test_finds_in_documents_prd(self, tmp_path: Path):
+        prd = tmp_path / "documents" / "prd"
+        prd.mkdir(parents=True)
+        (prd / "meta.yaml").write_text("type: web-app", encoding="utf-8")
+        assert storage.find_meta_dir(tmp_path) == prd
+
+    def test_finds_in_docs(self, tmp_path: Path):
+        docs = tmp_path / "docs"
+        docs.mkdir(parents=True)
+        (docs / "meta.yaml").write_text("type: web-app", encoding="utf-8")
+        assert storage.find_meta_dir(tmp_path) == docs
 
 
 class TestEnsurePrdDir:

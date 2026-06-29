@@ -45,6 +45,7 @@ class FieldDef:
     prompt: str = ""
     why: str = ""
     choices: list[str] = field(default_factory=list)
+    drill_questions: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> FieldDef:
@@ -56,6 +57,7 @@ class FieldDef:
             prompt=data.get("prompt", ""),
             why=data.get("why", ""),
             choices=list(data.get("choices", []) or []),
+            drill_questions=list(data.get("drill_questions", []) or []),
         )
 
 
