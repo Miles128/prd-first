@@ -1,4 +1,4 @@
-"""PRD 文件读写:统一管理 documents/prd/ 目录的持久化。"""
+"""PRD 文件读写:统一管理 documents/ 目录的持久化。"""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from .models import PrdMeta
 
 
 def prd_dir(root: Path | None = None) -> Path:
-    """返回 documents/prd 目录路径。root 默认为当前工作目录。"""
+    """返回 documents 目录路径。root 默认为当前工作目录。"""
     base = root or Path.cwd()
     return base / PRD_DIR_NAME
 
@@ -30,7 +30,7 @@ def meta_file(root: Path | None = None) -> Path:
 
 
 def ensure_prd_dir(root: Path | None = None) -> Path:
-    """创建 documents/prd 目录(若不存在),返回路径。"""
+    """创建 documents 目录(若不存在),返回路径。"""
     d = prd_dir(root)
     d.mkdir(parents=True, exist_ok=True)
     return d

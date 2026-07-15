@@ -12,8 +12,8 @@ from prd_first.models import PrdMeta
 
 @pytest.fixture
 def tmp_prd_dir(tmp_path: Path):
-    """Create a temporary directory with documents/prd/ structure."""
-    prd = tmp_path / "documents" / "prd"
+    """Create a temporary directory with documents/ structure."""
+    prd = tmp_path / "documents"
     prd.mkdir(parents=True)
     return tmp_path
 
@@ -21,16 +21,16 @@ def tmp_prd_dir(tmp_path: Path):
 class TestPrdDir:
     def test_default(self, monkeypatch, tmp_path: Path):
         monkeypatch.chdir(tmp_path)
-        assert storage.prd_dir() == tmp_path / "documents" / "prd"
+        assert storage.prd_dir() == tmp_path / "documents"
 
     def test_custom_root(self, tmp_path: Path):
-        assert storage.prd_dir(tmp_path) == tmp_path / "documents" / "prd"
+        assert storage.prd_dir(tmp_path) == tmp_path / "documents"
 
 
 class TestEnsurePrdDir:
     def test_creates_dir(self, tmp_path: Path):
         storage.ensure_prd_dir(tmp_path)
-        assert (tmp_path / "documents" / "prd").exists()
+        assert (tmp_path / "documents").exists()
 
     def test_idempotent(self, tmp_path: Path):
         storage.ensure_prd_dir(tmp_path)
@@ -51,14 +51,14 @@ class TestMetaOperations:
 
     def test_load_meta_corrupt(self, tmp_path: Path):
         """Corrupt meta.yaml should return None, not crash."""
-        prd = tmp_path / "documents" / "prd"
+        prd = tmp_path / "documents"
         prd.mkdir(parents=True)
         (prd / "meta.yaml").write_text("{{invalid yaml", encoding="utf-8")
         assert storage.load_meta(tmp_path) is None
 
     def test_load_meta_empty(self, tmp_path: Path):
         """Empty meta.yaml should return a default PrdMeta."""
-        prd = tmp_path / "documents" / "prd"
+        prd = tmp_path / "documents"
         prd.mkdir(parents=True)
         (prd / "meta.yaml").write_text("", encoding="utf-8")
         meta = storage.load_meta(tmp_path)

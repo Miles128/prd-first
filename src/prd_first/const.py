@@ -16,8 +16,8 @@ __all__ = [
     "PACKAGE_ROOT",
 ]
 
-# PRD 文件布局(在项目根目录下的 documents/prd/)
-PRD_DIR_NAME = "documents/prd"
+# PRD 文件布局(在项目根目录下的 documents/)
+PRD_DIR_NAME = "documents"
 PRD_FILE_NAME = "PRD.md"
 META_FILE_NAME = "meta.yaml"
 

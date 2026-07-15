@@ -86,7 +86,7 @@ class TemplateDef:
 
 @dataclass
 class PrdMeta:
-    """PRD 元数据（对应 documents/prd/meta.yaml）。"""
+    """PRD 元数据（对应 documents/meta.yaml）。"""
 
     type: str
     answers: dict[str, Any] = field(default_factory=dict)
