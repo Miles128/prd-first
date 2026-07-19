@@ -68,13 +68,22 @@ class TestCheck:
 
         result = runner.invoke(app, ["check"])
         assert result.exit_code == 0
+        assert "类型: web-app" in result.output
+        assert "必填: 8/8" in result.output
+        assert "完整" in result.output
 
     def test_check_incomplete(self, tmp_path: Path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        storage.save_meta(PrdMeta.new("web-app"))
+        meta = PrdMeta.new("web-app")
+        meta.set("problem", "p")
+        storage.save_meta(meta)
 
         result = runner.invoke(app, ["check"])
         assert result.exit_code == 2
+        assert "类型: web-app" in result.output
+        assert "必填: 1/8" in result.output
+        assert "users" in result.output
+        assert "prd edit users" in result.output
 
     def test_check_no_prd(self, tmp_path: Path, monkeypatch):
         monkeypatch.chdir(tmp_path)

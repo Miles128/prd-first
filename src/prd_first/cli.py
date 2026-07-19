@@ -86,23 +86,35 @@ def _check_result(template: TemplateDef, meta: PrdMeta) -> tuple[bool, list[Fiel
     return len(missing) == 0, missing
 
 
+def _format_status(template: TemplateDef, meta: PrdMeta) -> str:
+    """格式化完整度状态文本。"""
+    is_complete, missing = _check_result(template, meta)
+    required_fields = [f for f in template.fields if f.required]
+    required_filled = sum(1 for f in required_fields if _is_filled(meta.get(f.key)))
+    filled = sum(1 for f in template.fields if _is_filled(meta.get(f.key)))
+    total = len(template.fields)
+    pct = round(filled * 100 / total) if total else 0
+    status = "完整" if is_complete else "未完成"
+
+    lines = [
+        f"类型: {template.type}",
+        f"必填: {required_filled}/{len(required_fields)} {status}",
+        f"整体: {filled}/{total} ({pct}%)",
+    ]
+    if missing:
+        lines.append("缺失必填:")
+        for f in missing:
+            lines.append(f"  • {f.label} ({f.key})  →  prd edit {f.key}")
+    return "\n".join(lines)
+
+
 def _render_and_report(template: TemplateDef, meta: PrdMeta, interrupted: bool) -> None:
     """渲染 PRD.md 并打印完成度报告。"""
     content = render_prd(template, meta)
     storage.save_prd(content)
 
-    is_complete, missing = _check_result(template, meta)
-    filled = sum(1 for f in template.fields if _is_filled(meta.get(f.key)))
-    total = len(template.fields)
-    pct = round(filled * 100 / total) if total else 0
-
     print()
-    print(f"必填: {'OK' if is_complete else '未完成'} | 整体: {filled}/{total} | 完成度: {pct}%")
-    if missing:
-        print("缺失的必填项:")
-        for f in missing:
-            print(f"  • {f.label} ({f.key})")
-
+    print(_format_status(template, meta))
     print(f"\n✅ PRD 已生成: {storage.prd_file()}")
     if interrupted:
         print("提示:运行 prd init 可继续未完成的字段。")
@@ -188,7 +200,8 @@ def edit(
         raise typer.Exit(code=1)
 
     current = meta.get(field_def.key)
-    if _is_filled(current):
+    # list 类型由 ask_list 展示当前项,避免重复打印
+    if _is_filled(current) and field_def.type != "list":
         print(f"当前值: {_preview(current)}")
 
     try:
@@ -214,12 +227,12 @@ def check():
     meta = storage.require_meta()
     template = _load_template_for_meta(meta)
 
-    is_complete, missing = _check_result(template, meta)
-    print(f"必填完整: {'是' if is_complete else '否'}")
-    if missing:
-        print("缺失必填项:")
-        for f in missing:
-            print(f"  • {f.label}")
+    is_complete, _missing = _check_result(template, meta)
+    print(_format_status(template, meta))
+    if is_complete:
+        print("\n可以开始编码。记得遵守范围 / 非目标 / 验收标准。")
+    else:
+        print("\n建议先补齐缺失项,或明确跳过后再编码。")
 
     raise typer.Exit(code=0 if is_complete else 2)
 
