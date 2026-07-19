@@ -11,16 +11,18 @@ pip install prd-first
 或本地开发安装：
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/Miles128/prd-first.git
 cd prd-first
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 ## 使用
 
 ```bash
+prd --version
+
 # 交互式初始化 PRD（推荐）
 prd init
 
@@ -40,10 +42,12 @@ prd new web-app
 # 检查 PRD 完整度
 prd check
 
-# 查看生成的 PRD
+# 查看生成的 PRD / 单个字段
 prd show
+prd show --section problem
 
-# 编辑单个字段（自动 bump 版本 + 记录变更）
+# 编辑单个字段（自动 bump 版本 + 记录变更；不带参数进入交互选择）
+prd edit
 prd edit problem
 
 # 对某个分支做 drill-down 追问，保存为 drill-<topic>.md
@@ -53,31 +57,45 @@ prd drill problem
 prd template list
 ```
 
-## 在 AI 编程助手中使用
+## 在 AI 编程助手中使用（一键接入）
 
-### Claude Code / Codex
+先安装 CLI，再在项目根执行：
 
-在对话中输入：
+```bash
+# 一次装齐 Claude Code + Cursor + Codex
+prd skill install
+
+# 或按目标安装
+prd skill install claude
+prd skill install cursor
+prd skill install codex
+
+# Claude Code 装到用户级 skills
+prd skill install claude --global
+```
+
+| 目标 | 写入位置 |
+|------|----------|
+| `claude` | `.claude/skills/prd-first/SKILL.md`（`--global` → `~/.claude/skills/...`） |
+| `cursor` | `.cursor/rules/prd-first.mdc`（`alwaysApply: true`） |
+| `codex` | 项目根 `AGENTS.md`（`<!-- prd-first -->` 标记段，可重复更新） |
+
+装好后重开对话，直接说：
 
 ```
-/skill prd-first
 帮我做个 todo 应用
 ```
 
-AI 会自动检测 `documents/PRD.md` 是否存在，没有就引导你走问答流程。
+或显式：`/skill prd-first`。AI 会先检查 `documents/PRD.md`。
 
-### Cursor
-
-在 `.cursor/rules/` 中添加 prd-first 的 SKILL.md 内容，或直接告诉 AI：
-
-> 先检查 documents/PRD.md，没有就用 prd init 生成
+源文件也在仓库 `skill/SKILL.md`（与包内 `assets/skill/SKILL.md` 同步）。
 
 ## 工作流
 
 ```
 prd init → 交互式问答 → 生成 documents/PRD.md + documents/meta.yaml
     ↓
-AI 编程助手读取 PRD → 按范围/非目标/验收标准编码
+prd skill install → AI 助手读取 PRD → 按范围/非目标/验收标准编码
     ↓
 需求变化 → prd edit <field> 更新（自动版本号 + changelog）→ PRD 与代码同步
     ↓
@@ -99,13 +117,23 @@ AI 编程助手读取 PRD → 按范围/非目标/验收标准编码
 
 每种类型都有配套的 drill-guide（追问指南），`prd drill` 时自动加载。
 
-## 作为 Skill 使用
+## 发布到 PyPI
 
-将 `skill/SKILL.md` 的内容放入 AI 编程助手的规则文件中：
+维护者发布新版本：
 
-- **Claude Code**: `~/.claude/CLAUDE.md` 或项目 `.claude/CLAUDE.md`
-- **Cursor**: `.cursor/rules/`
-- **Codex**: 项目根目录 `AGENTS.md`
+1. 更新 `pyproject.toml` / `__init__.py` 版本号与 `CHANGELOG.md`
+2. 合并到 `main` 后打 tag 并创建 GitHub Release：
+
+```bash
+git tag v0.3.0
+git push origin v0.3.0
+gh release create v0.3.0 --generate-notes
+```
+
+3. 在 [PyPI](https://pypi.org) 为项目配置 **Trusted Publisher**（GitHub Actions，workflow：`publish.yml`，environment：`pypi`）
+4. Release 发布后，`Publish` workflow 会自动 `python -m build` 并上传
+
+也可在 Actions 里手动跑 `Publish`（`workflow_dispatch`）。
 
 ## License
 

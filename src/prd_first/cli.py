@@ -1,13 +1,14 @@
 """prd-first CLI 入口。
 
 命令:
-  prd init [type]         交互式初始化(选类型 + 逐字段问答)
-  prd new <type>          清空已有答案,按类型重新开始
-  prd edit <field>        编辑单个字段
-  prd drill <topic>       对某个分支进行 drill-down 风格书面化追问
-  prd check               校验完整度
-  prd show                打印当前 PRD.md
-  prd template list       列出所有模板
+  prd init [type]              交互式初始化(选类型 + 逐字段问答)
+  prd new <type>               清空已有答案,按类型重新开始
+  prd edit [field]             编辑字段;省略则列出可编辑字段
+  prd drill <topic>            对某个分支进行 drill-down 风格书面化追问
+  prd check                    校验完整度
+  prd show [--section KEY]     打印 PRD 或单个字段
+  prd template list            列出所有模板
+  prd skill install [target]   安装 Skill 到 Claude/Cursor/Codex
 """
 
 from __future__ import annotations
@@ -15,11 +16,12 @@ from __future__ import annotations
 import questionary
 import typer
 
+from . import __version__, storage
 from . import drill as drill_module
-from . import storage
 from .models import FieldDef, PrdMeta, TemplateDef, _is_filled, list_templates, load_template
 from .prompts import QuitPrompt, apply_answer, ask_field
-from .render import render_prd
+from .render import render_prd, render_section
+from .skill_install import install_claude, install_codex, install_cursor
 
 app = typer.Typer(
     name="prd",
@@ -30,6 +32,29 @@ app = typer.Typer(
 
 template_app = typer.Typer(help="模板相关命令。")
 app.add_typer(template_app, name="template")
+
+skill_app = typer.Typer(help="AI 助手 Skill 安装。")
+app.add_typer(skill_app, name="skill")
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        print(__version__)
+        raise typer.Exit()
+
+
+@app.callback()
+def _main(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        "-V",
+        help="显示版本号。",
+        callback=_version_callback,
+        is_eager=True,
+    ),
+) -> None:
+    """prd-first CLI。"""
 
 
 def _pick_template() -> TemplateDef:
@@ -59,6 +84,9 @@ def _resolve_template(template_type: str | None) -> TemplateDef:
 
 def _run_questions(template: TemplateDef, meta: PrdMeta) -> bool:
     """对未答字段逐个提问。返回是否被中途退出。"""
+    required = sum(1 for f in template.fields if f.required)
+    print(f"模板: {template.name} — 共 {len(template.fields)} 题(必填 {required})")
+
     total = len(template.fields)
     for i, field in enumerate(template.fields, 1):
         current = meta.get(field.key)
@@ -134,6 +162,22 @@ def _load_template_for_meta(meta: PrdMeta) -> TemplateDef:
         raise typer.Exit(code=1) from None
 
 
+def _preview(value: object) -> str:
+    if isinstance(value, list):
+        return "; ".join(str(v) for v in value)
+    return str(value)
+
+
+def _print_editable_fields(template: TemplateDef, meta: PrdMeta) -> None:
+    print(f"可编辑字段 (类型: {template.type}):")
+    for f in template.fields:
+        filled = _is_filled(meta.get(f.key))
+        mark = "✓" if filled else "·"
+        req = "必填" if f.required else "可选"
+        status = "已填" if filled else "空"
+        print(f"  {mark} {f.key:16} {f.label}  [{req}/{status}]  →  prd edit {f.key}")
+
+
 @app.command()
 def init(
     type: str | None = typer.Argument(None, help="项目类型,如 web-app。省略则交互选择。"),
@@ -186,11 +230,18 @@ def new_cmd(
 
 @app.command()
 def edit(
-    field: str = typer.Argument(..., help="要编辑的字段 key,如 problem。"),
+    field: str | None = typer.Argument(
+        None, help="要编辑的字段 key,如 problem。省略则列出全部字段。"
+    ),
 ):
-    """编辑单个字段并重新生成 PRD。"""
+    """编辑单个字段并重新生成 PRD;省略字段时列出可编辑项。"""
     meta = storage.require_meta()
     template = _load_template_for_meta(meta)
+
+    if field is None:
+        _print_editable_fields(template, meta)
+        raise typer.Exit(code=0)
+
     field_def = template.find(field)
     if field_def is None:
         keys = ", ".join(f.key for f in template.fields)
@@ -213,14 +264,14 @@ def edit(
         raise typer.Exit(code=0) from None
 
     apply_answer(meta, field_def, result)
+    new = meta.get(field_def.key)
+    if current == new:
+        print("值未变化,跳过版本更新。")
+    else:
+        meta.bump(field_def.key, current, new)
+        print(f"\n✅ 已更新「{field_def.label}」(v{meta.version})")
     storage.save_meta(meta)
     _render_and_report(template, meta, interrupted=False)
-
-
-def _preview(value: object) -> str:
-    if isinstance(value, list):
-        return "; ".join(str(v) for v in value)
-    return str(value)
 
 
 @app.command()
@@ -239,53 +290,28 @@ def check():
     raise typer.Exit(code=0 if is_complete else 2)
 
 
-@app.command(name="edit")
-def edit_cmd(
-    field_key: str = typer.Argument(..., help="要编辑的字段 key,如 problem。"),
-):
-    """编辑单个字段,自动 bump 版本并记录变更。"""
-    meta = storage.require_meta()
-    try:
-        template = load_template(meta.type)
-    except FileNotFoundError:
-        typer.secho(f"❌ meta 中记录的类型 {meta.type} 无对应模板。", fg=typer.colors.RED, err=True)
-        raise typer.Exit(code=1) from None
-
-    field = template.find(field_key)
-    if field is None:
-        typer.secho(
-            f"❌ 字段 {field_key} 不存在。可用字段: "
-            + ", ".join(f.key for f in template.fields),
-            fg=typer.colors.RED,
-            err=True,
-        )
-        raise typer.Exit(code=1)
-
-    old = meta.get(field_key)
-    print(f"当前值: {old}")
-    try:
-        result = ask_field(field, meta)
-    except QuitPrompt:
-        print("\n已取消,未修改。")
-        raise typer.Exit(code=0) from None
-
-    apply_answer(meta, field, result)
-    new = meta.get(field_key)
-    if old == new:
-        print("值未变化,跳过版本更新。")
-    else:
-        meta.bump(field_key, old, new)
-        print(f"\n✅ 已更新「{field.label}」(v{meta.version})")
-
-    storage.save_meta(meta)
-    content = render_prd(template, meta)
-    storage.save_prd(content)
-    print(f"✅ PRD 已重新生成: {storage.prd_file()}")
-
-
 @app.command(name="show")
-def show_cmd():
-    """打印当前 PRD.md 内容。"""
+def show_cmd(
+    section: str | None = typer.Option(
+        None, "--section", "-s", help="只显示某个字段,如 problem。"
+    ),
+):
+    """打印当前 PRD.md 内容,或单个字段小节。"""
+    if section:
+        meta = storage.require_meta()
+        template = _load_template_for_meta(meta)
+        try:
+            print(render_section(template, meta, section), end="")
+        except KeyError:
+            keys = ", ".join(f.key for f in template.fields)
+            typer.secho(
+                f"❌ 字段 `{section}` 不存在。可用字段: {keys}",
+                fg=typer.colors.RED,
+                err=True,
+            )
+            raise typer.Exit(code=1) from None
+        return
+
     content = storage.read_prd()
     if content is None:
         typer.secho("❌ 没有 PRD。请先运行 prd init。", fg=typer.colors.RED, err=True)
@@ -305,6 +331,52 @@ def template_list():
         required = sum(1 for f in t.fields if f.required)
         print(f"{t.type:16} {t.name}  (必填 {required} / 共 {len(t.fields)})")
         print(f"  {t.description}")
+        print(f"  开始: prd init {t.type}")
+
+
+@skill_app.command("install")
+def skill_install(
+    target: str = typer.Argument(
+        "all",
+        help="安装目标: claude / cursor / codex / all",
+    ),
+    user_global: bool = typer.Option(
+        False,
+        "--global",
+        "-g",
+        help="Claude:安装到用户目录 ~/.claude/skills/(默认装到当前项目)。",
+    ),
+):
+    """一键把 Skill 写入 Claude Code / Cursor / Codex。"""
+    from pathlib import Path
+
+    root = Path.cwd()
+    target = target.lower().strip()
+    allowed = {"claude", "cursor", "codex", "all"}
+    if target not in allowed:
+        typer.secho(
+            f"❌ 未知目标 `{target}`。可选: {', '.join(sorted(allowed))}",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    written: list[Path] = []
+    try:
+        if target in {"claude", "all"}:
+            written.append(install_claude(root, user_global=user_global))
+        if target in {"cursor", "all"}:
+            written.append(install_cursor(root))
+        if target in {"codex", "all"}:
+            written.append(install_codex(root))
+    except OSError as e:
+        typer.secho(f"❌ 写入失败: {e}", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from e
+
+    print("已安装 Skill:")
+    for path in written:
+        print(f"  ✓ {path}")
+    print("\n重启或重开对话后生效。然后可以说:帮我做个 todo 应用")
 
 
 @app.command()

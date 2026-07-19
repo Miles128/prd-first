@@ -78,6 +78,8 @@ def ask_multi(field: FieldDef, current: Any) -> list[str]:
 def _collect_list_items(start: list[str] | None = None) -> list[str] | Any:
     """逐项输入列表,空行结束。返回 SKIP_SENTINEL 表示跳过。"""
     items: list[str] = list(start or [])
+    if not items:
+        print("  提示:逐条输入,空行结束")
     while True:
         item = _ask_with_skip(f"第 {len(items) + 1} 项(空行结束):")
         if item == SKIP_SENTINEL:

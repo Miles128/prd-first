@@ -44,14 +44,6 @@ fields:
     prompt: "需要哪些页面/路由?"
     why: "页面清单直接决定信息架构和路由设计。"
 
-  - key: auth
-    label: 认证方式
-    required: false
-    type: single
-    choices: ["无认证", "邮箱密码", "OAuth(Google/GitHub)", "SSO/企业"]
-    prompt: "需要登录吗?用哪种认证?"
-    why: "认证选型会牵动数据模型和部署复杂度。"
-
   - key: tech_stack
     label: 技术栈
     required: true
@@ -65,3 +57,11 @@ fields:
     type: list
     prompt: "完成时怎样验收?(可勾选的检查项)"
     why: "验收清单是任务完成的客观判据。"
+
+  - key: auth
+    label: 认证方式
+    required: false
+    type: single
+    choices: ["无认证", "邮箱密码", "OAuth(Google/GitHub)", "SSO/企业"]
+    prompt: "需要登录吗?用哪种认证?"
+    why: "认证选型会牵动数据模型和部署复杂度;可跳过。"

@@ -90,6 +90,24 @@ class TestShow:
         assert result.exit_code == 0
         assert "# Test" in result.output
 
+    def test_show_section(self, tmp_path: Path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        meta = PrdMeta.new("web-app")
+        meta.set("problem", "核心痛点")
+        storage.save_meta(meta)
+
+        result = runner.invoke(app, ["show", "--section", "problem"])
+        assert result.exit_code == 0
+        assert "问题陈述" in result.output
+        assert "核心痛点" in result.output
+        assert "目标用户" not in result.output
+
+    def test_show_section_unknown(self, tmp_path: Path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        storage.save_meta(PrdMeta.new("web-app"))
+        result = runner.invoke(app, ["show", "-s", "nope"])
+        assert result.exit_code == 1
+
     def test_show_no_prd(self, tmp_path: Path, monkeypatch):
         monkeypatch.chdir(tmp_path)
         result = runner.invoke(app, ["show"])
@@ -329,6 +347,14 @@ class TestEdit:
         assert result.exit_code == 0
         assert "已取消" in result.output
         assert storage.load_meta().version == 1
+
+class TestVersion:
+    def test_version(self):
+        result = runner.invoke(app, ["--version"])
+        assert result.exit_code == 0
+        assert "0.3.0" in result.output
+
+
 class TestNew:
     def test_new_starts_fresh(self, tmp_path: Path, monkeypatch):
         monkeypatch.chdir(tmp_path)
@@ -369,3 +395,30 @@ class TestTemplateList:
         assert "web-app" in result.output
         assert "backend-data" in result.output
         assert "必填" in result.output
+
+
+class TestEditList:
+    def test_edit_no_arg_lists_fields(self, tmp_path: Path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        meta = PrdMeta.new("web-app")
+        meta.set("problem", "p")
+        storage.save_meta(meta)
+
+        result = runner.invoke(app, ["edit"])
+        assert result.exit_code == 0
+        assert "可编辑字段" in result.output
+        assert "problem" in result.output
+        assert "已填" in result.output
+
+    def test_edit_skip_and_bump(self, tmp_path: Path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        meta = PrdMeta.new("web-app")
+        meta.set("problem", "old")
+        storage.save_meta(meta)
+
+        with patch("prd_first.cli.ask_field") as mock_ask:
+            mock_ask.return_value = SKIP_SENTINEL
+            result = runner.invoke(app, ["edit", "problem"])
+
+        assert result.exit_code == 0
+        assert storage.load_meta().get("problem") == "old"
