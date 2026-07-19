@@ -41,6 +41,16 @@ def test_render_placeholder():
     assert "必填项未填写" in md
 
 
+def test_render_optional_empty_has_no_required_comment():
+    template = _make_template([
+        {"key": "note", "label": "备注", "required": False, "type": "text"},
+    ])
+    meta = PrdMeta.new("test")
+    md = render_prd(template, meta)
+    assert "待补充" in md
+    assert "必填项未填写" not in md
+
+
 def test_render_bool():
     template = _make_template([
         {"key": "ok", "label": "确认", "required": False, "type": "text"},

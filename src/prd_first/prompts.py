@@ -41,8 +41,9 @@ def _ask_with_skip(prompt: str, default: str = "") -> str:
 
 
 def ask_text(field: FieldDef, current: Any) -> str:
-    """单行文本输入。"""
-    return _ask_with_skip(field.prompt)
+    """单行文本输入。已有值时作为默认预填。"""
+    default = str(current) if isinstance(current, str) and current.strip() else ""
+    return _ask_with_skip(field.prompt, default=default)
 
 
 def ask_single(field: FieldDef, current: Any) -> str:
