@@ -47,9 +47,12 @@ def ask_text(field: FieldDef, current: Any) -> str:
 
 
 def ask_single(field: FieldDef, current: Any) -> str:
-    """单选。"""
+    """单选。已有值时在提示中标明。"""
+    prompt = field.prompt
+    if isinstance(current, str) and current.strip():
+        prompt = f"{field.prompt} (当前: {current})"
     choices = list(field.choices) + ["⏭️ 跳过", "🚪 退出"]
-    answer = questionary.select(field.prompt, choices=choices).ask()
+    answer = questionary.select(prompt, choices=choices).ask()
     if answer is None:
         raise QuitPrompt()
     if answer == "⏭️ 跳过":
@@ -72,17 +75,40 @@ def ask_multi(field: FieldDef, current: Any) -> list[str]:
     return [a for a in answer if a in field.choices]
 
 
-def ask_list(field: FieldDef, current: Any) -> list[str]:
-    """列表:逐项输入,空行结束。"""
-    items: list[str] = []
+def _collect_list_items(start: list[str] | None = None) -> list[str] | Any:
+    """逐项输入列表,空行结束。返回 SKIP_SENTINEL 表示跳过。"""
+    items: list[str] = list(start or [])
     while True:
         item = _ask_with_skip(f"第 {len(items) + 1} 项(空行结束):")
         if item == SKIP_SENTINEL:
-            return SKIP_SENTINEL  # type: ignore[return-value]
+            return SKIP_SENTINEL
         if item == "":
             break
         items.append(item)
     return items
+
+
+def ask_list(field: FieldDef, current: Any) -> list[str]:
+    """列表:逐项输入,空行结束。已有值时可替换/追加/保持。"""
+    existing = list(current) if isinstance(current, list) and current else []
+    if existing:
+        print("当前列表:")
+        for i, item in enumerate(existing, 1):
+            print(f"  {i}. {item}")
+        mode = questionary.select(
+            "如何编辑这份列表?",
+            choices=["替换全部", "追加", "保持不变"],
+        ).ask()
+        if mode is None:
+            raise QuitPrompt()
+        if mode == "保持不变":
+            return existing
+        if mode == "追加":
+            return _collect_list_items(existing)  # type: ignore[return-value]
+        # 替换全部
+        return _collect_list_items()  # type: ignore[return-value]
+
+    return _collect_list_items()  # type: ignore[return-value]
 
 
 def ask_field(field: FieldDef, meta: PrdMeta) -> Any:

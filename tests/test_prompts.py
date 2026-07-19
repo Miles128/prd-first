@@ -106,6 +106,23 @@ class TestAskList:
         mock_q.text.return_value.ask.return_value = "s"
         assert ask_list(_field(type="list"), None) == SKIP_SENTINEL
 
+    @patch("prd_first.prompts.questionary")
+    def test_keep_existing(self, mock_q):
+        mock_q.select.return_value.ask.return_value = "保持不变"
+        assert ask_list(_field(type="list"), ["a", "b"]) == ["a", "b"]
+
+    @patch("prd_first.prompts.questionary")
+    def test_append_existing(self, mock_q):
+        mock_q.select.return_value.ask.return_value = "追加"
+        mock_q.text.return_value.ask.side_effect = ["c", ""]
+        assert ask_list(_field(type="list"), ["a", "b"]) == ["a", "b", "c"]
+
+    @patch("prd_first.prompts.questionary")
+    def test_replace_existing(self, mock_q):
+        mock_q.select.return_value.ask.return_value = "替换全部"
+        mock_q.text.return_value.ask.side_effect = ["x", ""]
+        assert ask_list(_field(type="list"), ["a", "b"]) == ["x"]
+
 
 class TestAskField:
     @patch("prd_first.prompts.questionary")
