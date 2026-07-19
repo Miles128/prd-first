@@ -105,3 +105,25 @@ class TestListTemplates:
         templates = list_templates()
         types = {t.type for t in templates}
         assert types >= {"web-app", "cli-tool", "ai-agent", "backend-data"}
+
+    def test_all_fields_have_why(self):
+        for t in list_templates():
+            for f in t.fields:
+                assert f.why.strip(), f"{t.type}.{f.key} missing why"
+
+    def test_required_counts(self):
+        expected = {
+            "web-app": 8,
+            "cli-tool": 9,
+            "ai-agent": 10,
+            "backend-data": 11,
+        }
+        for t in list_templates():
+            if t.type in expected:
+                required = sum(1 for f in t.fields if f.required)
+                assert required == expected[t.type], t.type
+
+    def test_backend_has_monitoring(self):
+        t = load_template("backend-data")
+        assert t.find("monitoring") is not None
+        assert t.find("monitoring").required is True

@@ -7,57 +7,74 @@ fields:
     required: true
     type: text
     prompt: "这个后端/数据任务解决什么问题?"
+    why: "先钉住业务问题,避免只堆接口和表。"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "怎样算成功?(吞吐量/延迟/正确率/SLA)"
+    why: "SLA 类指标决定架构和容量设计。"
 
   - key: sources
     label: 数据来源
     required: true
     type: list
     prompt: "数据从哪来?(数据库/API/文件/消息队列)"
+    why: "来源决定同步方式、延迟和权限边界。"
 
   - key: data_flow
     label: 数据流
     required: true
     type: text
     prompt: "数据怎么流动?(源 → 处理 → 存储 → 输出)"
+    why: "数据流图是管道设计的骨架。"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "第一版要覆盖哪些数据源和处理步骤?"
+    why: "先覆盖关键路径,其余批次迭代。"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做哪些?"
+    why: "挡住实时化、多租户等常见过度设计。"
 
   - key: external_deps
     label: 外部依赖
     required: true
     type: list
     prompt: "依赖哪些外部系统/服务?它们挂了会怎样?"
+    why: "外部依赖是故障的主要来源,必须提前点名。"
 
   - key: fault_tolerance
     label: 容错策略
     required: true
     type: text
     prompt: "出错怎么办?(重试/死信队列/降级/熔断)"
+    why: "后端项目大量代码在处理失败路径。"
+
+  - key: monitoring
+    label: 监控告警
+    required: true
+    type: list
+    prompt: "监控哪些指标?告警阈值是什么?"
+    why: "没有监控,线上故障只能靠用户报修。"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "用什么语言/框架/数据库/消息队列?"
+    why: "栈选型影响运维成本和团队上手速度。"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
-    prompt: "怎样验收?(包括出错场景)"
+    prompt: "怎样验收?(包括出错场景与告警是否生效)"
+    why: "验收必须覆盖失败路径,不只是 happy path。"

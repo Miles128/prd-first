@@ -7,36 +7,42 @@ fields:
     required: true
     type: text
     prompt: "这个项目要解决什么问题?"
+    why: "没有清晰问题陈述,功能会越做越散。"
 
   - key: users
     label: 目标用户
     required: true
     type: text
     prompt: "谁会用?他们的技术水平和使用场景?"
+    why: "用户画像决定交互复杂度和文案语气。"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "做完了怎样算成功?给一个可验证标准。"
+    why: "可验证标准避免'感觉差不多了'就收工。"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "MVP 要包含哪些功能?(逐条输入,空行结束)"
+    why: "先锁定最小可交付,防止第一版做太大。"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做什么?(挡住 scope creep)"
+    why: "非目标是编码时拒绝'顺便加个 X'的依据。"
 
   - key: pages
     label: 页面结构
     required: true
     type: list
     prompt: "需要哪些页面/路由?"
+    why: "页面清单直接决定信息架构和路由设计。"
 
   - key: auth
     label: 认证方式
@@ -44,15 +50,18 @@ fields:
     type: single
     choices: ["无认证", "邮箱密码", "OAuth(Google/GitHub)", "SSO/企业"]
     prompt: "需要登录吗?用哪种认证?"
+    why: "认证选型会牵动数据模型和部署复杂度。"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
-    prompt: "前端/后端/数据库/部署分别用什么?"
+    prompt: "前端/后端/数据库/部署分别用什么?(写清约束)"
+    why: "技术栈约束避免中途换框架或引入未约定依赖。"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
     prompt: "完成时怎样验收?(可勾选的检查项)"
+    why: "验收清单是任务完成的客观判据。"

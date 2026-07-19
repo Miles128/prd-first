@@ -7,57 +7,67 @@ fields:
     required: true
     type: text
     prompt: "这个 AI 应用解决什么问题?为什么用 AI?"
+    why: "先确认问题真的需要模型,而不是普通规则能搞定。"
 
   - key: users
     label: 目标用户
     required: true
     type: text
     prompt: "谁用?他们对 AI 输出的容忍度?"
+    why: "容忍度决定是否需要人工复核和置信度展示。"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "怎样算成功?给出量化质量基线。"
+    why: "没有量化基线就无法判断 prompt/模型是否变好。"
 
   - key: role
     label: Agent 角色
     required: true
     type: text
-    prompt: "这个 Agent 扮演什么角色?一句话定位。"
+    prompt: "这个 Agent 扮演什么角色?输入是什么、输出是什么?"
+    why: "角色 + 输入/输出契约是 prompt 与工具设计的锚点。"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "第一版 Agent 要具备哪些能力?"
+    why: "先锁最小能力集,避免一上来就做多 Agent 编排。"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做哪些?"
+    why: "明确不做的能力,防止评估范围无限膨胀。"
 
   - key: evaluation
     label: 评估方式
     required: true
     type: text
     prompt: "怎么判断做得对?有没有评测数据?"
+    why: "AI 项目必须逼出评估方式,否则无法迭代。"
 
   - key: failure_modes
     label: 失败模式与降级
     required: true
     type: list
     prompt: "会怎么失败?失败时怎么降级?"
+    why: "模型会错;没有降级路径就不能上线。"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "用什么模型/框架/外部服务?"
+    why: "模型与框架选型影响成本、延迟和可替换性。"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
     prompt: "怎样验收?(必须包含量化指标)"
+    why: "量化验收把'感觉更好了'变成可发布标准。"

@@ -7,51 +7,60 @@ fields:
     required: true
     type: text
     prompt: "这个工具解决什么问题?为什么用 CLI?"
+    why: "先确认 CLI 是合适形态,而不是硬做成命令行。"
 
   - key: users
     label: 目标用户
     required: true
     type: text
     prompt: "谁会用?他们熟悉命令行吗?"
+    why: "用户熟练度决定帮助文案、默认值和错误提示风格。"
 
   - key: goal
     label: 成功定义
     required: true
     type: text
     prompt: "怎样算成功?给可验证标准。"
+    why: "可验证标准让脚本从'能跑'变成'可靠可用'。"
 
   - key: commands
     label: 命令结构
     required: true
     type: list
     prompt: "有哪些子命令?(格式:命令 说明)"
+    why: "命令树是 CLI 的产品界面,先定好再写实现。"
 
   - key: scope
     label: MVP 范围
     required: true
     type: list
     prompt: "第一版必须有哪些命令/能力?"
+    why: "先交付够用的命令集,避免一次做完整平台。"
 
   - key: non_goals
     label: 非目标
     required: true
     type: list
     prompt: "明确不做哪些?"
+    why: "挡住 GUI、插件系统等常见 scope creep。"
 
   - key: input
     label: 输入格式
     required: true
     type: text
-    prompt: "输入从哪来?(参数/stdin/文件/配置)"
+    prompt: "输入从哪来?(参数/stdin/文件/配置);输出期望是什么?"
+    why: "输入输出契约决定管道友好度和集成方式。"
 
   - key: tech_stack
     label: 技术栈
     required: true
     type: text
     prompt: "用什么语言/框架?有哪些外部依赖?"
+    why: "语言与依赖影响安装方式和可移植性。"
 
   - key: acceptance
     label: 验收标准
     required: true
     type: list
-    prompt: "怎样验收?(包括管道调用和退出码)"
+    prompt: "怎样验收?(包括管道调用、退出码、安装方式)"
+    why: "CLI 验收必须覆盖管道、退出码和可安装性。"

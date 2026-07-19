@@ -11,7 +11,7 @@ def _render_field(field: FieldDef, value: Any) -> str:
     """渲染单个字段为 markdown 小节。"""
     content = _render(value)
     lines = [f"### {field.label}", "", content, ""]
-    if not _is_filled(value):
+    if field.required and not _is_filled(value):
         lines.append("<!-- 必填项未填写 -->")
     return "\n".join(lines)
 

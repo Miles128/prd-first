@@ -79,10 +79,10 @@ AI 编程助手读取 PRD → 按范围/非目标/验收标准编码
 
 | 类型 | 说明 | 必填字段 |
 |------|------|----------|
-| `web-app` | Web 应用、SaaS、管理后台 | 9 |
+| `web-app` | Web 应用、SaaS、管理后台 | 8 |
 | `cli-tool` | 命令行工具、脚本 | 9 |
-| `ai-agent` | AI/Agent、RAG、LLM 应用 | 11 |
-| `backend-data` | API 服务、数据管道 | 10 |
+| `ai-agent` | AI/Agent、RAG、LLM 应用 | 10 |
+| `backend-data` | API 服务、数据管道 | 11 |
 
 ## 作为 Skill 使用
 
