@@ -12,6 +12,7 @@ __all__ = [
     "QUIT_TOKEN",
     "SKIP_SENTINEL",
     "PENDING_PLACEHOLDER",
+    "DRILL_FILE_PREFIX",
     "TEMPLATES_DIR",
     "PACKAGE_ROOT",
 ]
@@ -30,6 +31,9 @@ SKIP_SENTINEL = "__PRD_SKIP__"
 
 # 未填写字段的占位符
 PENDING_PLACEHOLDER = "_(待补充)_"
+
+# Drill 追问笔记文件前缀
+DRILL_FILE_PREFIX = "drill-"
 
 # 内置模板目录
 PACKAGE_ROOT = Path(__file__).resolve().parent

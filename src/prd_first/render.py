@@ -22,6 +22,7 @@ def render_prd(template: TemplateDef, meta: PrdMeta) -> str:
         f"# {template.name} PRD",
         "",
         f"项目类型: `{template.type}`",
+        f"版本: v{meta.version}" + (f" | 更新: {meta.updated_at}" if meta.updated_at else ""),
         "",
         "## 概述",
         "",
@@ -33,6 +34,16 @@ def render_prd(template: TemplateDef, meta: PrdMeta) -> str:
 
     for f in template.fields:
         lines.append(_render_field(f, meta.get(f.key)))
+        lines.append("")
+
+    if meta.changelog:
+        lines.append("## 变更记录")
+        lines.append("")
+        for entry in reversed(meta.changelog[-10:]):
+            lines.append(
+                f"- v{entry['version']} ({entry.get('at', '')[:19]}): "
+                f"更新「{entry['field']}」"
+            )
         lines.append("")
 
     return "\n".join(lines)

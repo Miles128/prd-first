@@ -29,6 +29,10 @@ prd init web-app
 prd init cli-tool
 prd init ai-agent
 prd init backend-data
+prd init mobile-app
+prd init api-service
+prd init data-pipeline
+prd init browser-extension
 
 # 重新开始（清空已有答案）
 prd new web-app
@@ -39,8 +43,11 @@ prd check
 # 查看生成的 PRD
 prd show
 
-# 编辑单个字段
+# 编辑单个字段（自动 bump 版本 + 记录变更）
 prd edit problem
+
+# 对某个分支做 drill-down 追问，保存为 drill-<topic>.md
+prd drill problem
 
 # 列出所有模板
 prd template list
@@ -72,7 +79,9 @@ prd init → 交互式问答 → 生成 documents/PRD.md + documents/meta.yaml
     ↓
 AI 编程助手读取 PRD → 按范围/非目标/验收标准编码
     ↓
-需求变化 → prd edit <field> 更新 → PRD 与代码同步
+需求变化 → prd edit <field> 更新（自动版本号 + changelog）→ PRD 与代码同步
+    ↓
+字段含糊 → prd drill <topic> 追问 → 保存 drill-<topic>.md 补充说明
 ```
 
 ## 项目类型模板
@@ -83,6 +92,12 @@ AI 编程助手读取 PRD → 按范围/非目标/验收标准编码
 | `cli-tool` | 命令行工具、脚本 | 9 |
 | `ai-agent` | AI/Agent、RAG、LLM 应用 | 10 |
 | `backend-data` | API 服务、数据管道 | 11 |
+| `mobile-app` | iOS/Android/跨端移动应用 | 9 |
+| `api-service` | REST/GraphQL 后端服务、微服务 | 10 |
+| `data-pipeline` | ETL/ELT、批处理、实时流 | 12 |
+| `browser-extension` | Chrome/Edge 扩展、插件 | 10 |
+
+每种类型都有配套的 drill-guide（追问指南），`prd drill` 时自动加载。
 
 ## 作为 Skill 使用
 

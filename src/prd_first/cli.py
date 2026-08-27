@@ -4,6 +4,7 @@
   prd init [type]         交互式初始化(选类型 + 逐字段问答)
   prd new <type>          清空已有答案,按类型重新开始
   prd edit <field>        编辑单个字段
+  prd drill <topic>       对某个分支进行 drill-down 风格书面化追问
   prd check               校验完整度
   prd show                打印当前 PRD.md
   prd template list       列出所有模板
@@ -14,6 +15,7 @@ from __future__ import annotations
 import questionary
 import typer
 
+from . import drill as drill_module
 from . import storage
 from .models import FieldDef, PrdMeta, TemplateDef, _is_filled, list_templates, load_template
 from .prompts import QuitPrompt, apply_answer, ask_field
@@ -237,6 +239,50 @@ def check():
     raise typer.Exit(code=0 if is_complete else 2)
 
 
+@app.command(name="edit")
+def edit_cmd(
+    field_key: str = typer.Argument(..., help="要编辑的字段 key,如 problem。"),
+):
+    """编辑单个字段,自动 bump 版本并记录变更。"""
+    meta = storage.require_meta()
+    try:
+        template = load_template(meta.type)
+    except FileNotFoundError:
+        typer.secho(f"❌ meta 中记录的类型 {meta.type} 无对应模板。", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from None
+
+    field = template.find(field_key)
+    if field is None:
+        typer.secho(
+            f"❌ 字段 {field_key} 不存在。可用字段: "
+            + ", ".join(f.key for f in template.fields),
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    old = meta.get(field_key)
+    print(f"当前值: {old}")
+    try:
+        result = ask_field(field, meta)
+    except QuitPrompt:
+        print("\n已取消,未修改。")
+        raise typer.Exit(code=0) from None
+
+    apply_answer(meta, field, result)
+    new = meta.get(field_key)
+    if old == new:
+        print("值未变化,跳过版本更新。")
+    else:
+        meta.bump(field_key, old, new)
+        print(f"\n✅ 已更新「{field.label}」(v{meta.version})")
+
+    storage.save_meta(meta)
+    content = render_prd(template, meta)
+    storage.save_prd(content)
+    print(f"✅ PRD 已重新生成: {storage.prd_file()}")
+
+
 @app.command(name="show")
 def show_cmd():
     """打印当前 PRD.md 内容。"""
@@ -259,6 +305,45 @@ def template_list():
         required = sum(1 for f in t.fields if f.required)
         print(f"{t.type:16} {t.name}  (必填 {required} / 共 {len(t.fields)})")
         print(f"  {t.description}")
+
+
+@app.command()
+def drill(
+    topic: str | None = typer.Argument(None, help="要追问的主题或字段 key,如 problem。"),
+):
+    """对 PRD 的某个分支进行 drill-down 书面化追问,保存为 drill-<topic>.md。"""
+    meta = storage.require_meta()
+    try:
+        template = load_template(meta.type)
+    except FileNotFoundError:
+        typer.secho(f"❌ meta 中记录的类型 {meta.type} 无对应模板。", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1) from None
+
+    resolved_topic = topic
+    if resolved_topic is None:
+        choices = [f.label for f in template.fields]
+        selected = questionary.select("选择要追问的分支:", choices=choices).ask()
+        if selected is None:
+            raise typer.Exit(code=0)
+        label_to_key = {f.label: f.key for f in template.fields}
+        resolved_topic = label_to_key[selected]
+
+    guide = drill_module.load_drill_guide(meta.type)
+    questions = drill_module.collect_questions(template, guide, resolved_topic)
+
+    print(
+        f"\n🔥 开始对「{resolved_topic}」进行 drill 追问。"
+        f"共 {len(questions)} 个问题,输入 q 可随时退出。"
+    )
+    notes = drill_module.run_drill_session(questions)
+
+    if not notes:
+        print("没有记录任何内容,未保存。")
+        raise typer.Exit(code=0)
+
+    content = drill_module.render_drill_notes(resolved_topic, notes)
+    path = storage.save_drill(resolved_topic, content)
+    print(f"\n✅ Drill 笔记已保存: {path}")
 
 
 if __name__ == "__main__":

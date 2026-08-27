@@ -1,0 +1,74 @@
+type: browser-extension
+name: 浏览器扩展
+description: Chrome/Edge/Firefox 扩展、插件、网页增强工具。
+fields:
+  - key: problem
+    label: 问题陈述
+    required: true
+    type: text
+    prompt: "这个扩展解决什么浏览器场景问题?"
+    why: "先确认浏览器场景下的真实痛点。"
+
+  - key: users
+    label: 目标用户
+    required: true
+    type: text
+    prompt: "谁用?他们的浏览器使用习惯?"
+    why: "用户浏览器习惯决定交互和安装门槛。"
+
+  - key: goal
+    label: 成功定义
+    required: true
+    type: text
+    prompt: "怎样算成功?给可验证标准。"
+    why: "没有可验证标准就无法判断扩展是否成功。"
+
+  - key: trigger
+    label: 触发方式
+    required: true
+    type: single
+    choices: ["点击图标", "页面自动注入", "右键菜单", "快捷键", "多方式"]
+    prompt: "用户怎么触发扩展?"
+    why: "触发方式直接影响用户使用路径。"
+
+  - key: permissions
+    label: 所需权限
+    required: true
+    type: list
+    prompt: "需要哪些权限?(tabs/storage/activeTab/host 等)"
+    why: "权限最小化决定审核通过率和用户信任。"
+
+  - key: sites
+    label: 作用站点
+    required: true
+    type: text
+    prompt: "作用于哪些站点?全站还是指定域名?"
+    why: "作用站点范围决定注入逻辑与安全风险。"
+
+  - key: scope
+    label: MVP 范围
+    required: true
+    type: list
+    prompt: "第一版必须有哪些能力?"
+    why: "MVP 范围决定第一版能力集合。"
+
+  - key: non_goals
+    label: 非目标
+    required: true
+    type: list
+    prompt: "明确不做什么?"
+    why: "明确不做哪些能力,防止扩展臃肿。"
+
+  - key: tech_stack
+    label: 技术栈
+    required: true
+    type: text
+    prompt: "Manifest 版本/框架/构建工具?"
+    why: "Manifest 版本和框架决定兼容性。"
+
+  - key: acceptance
+    label: 验收标准
+    required: true
+    type: list
+    prompt: "怎样验收?(含安装、权限审核、跨浏览器兼容)"
+    why: "含权限审核的验收才符合商店上架要求。"

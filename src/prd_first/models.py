@@ -45,6 +45,7 @@ class FieldDef:
     prompt: str = ""
     why: str = ""
     choices: list[str] = field(default_factory=list)
+    drill_questions: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> FieldDef:
@@ -56,6 +57,7 @@ class FieldDef:
             prompt=data.get("prompt", ""),
             why=data.get("why", ""),
             choices=list(data.get("choices", []) or []),
+            drill_questions=list(data.get("drill_questions", []) or []),
         )
 
 
@@ -90,6 +92,9 @@ class PrdMeta:
 
     type: str
     answers: dict[str, Any] = field(default_factory=dict)
+    version: int = 1
+    updated_at: str = ""
+    changelog: list[dict[str, Any]] = field(default_factory=list)
 
     def get(self, key: str) -> Any:
         return self.answers.get(key)
@@ -97,13 +102,35 @@ class PrdMeta:
     def set(self, key: str, value: Any) -> None:
         self.answers[key] = value
 
+    def bump(self, key: str, old: Any, new: Any) -> None:
+        """记录一次字段变更,自增版本号。"""
+        from datetime import datetime
+
+        self.version += 1
+        self.updated_at = datetime.now().astimezone().isoformat()
+        self.changelog.append(
+            {
+                "version": self.version,
+                "field": key,
+                "old": old,
+                "new": new,
+                "at": self.updated_at,
+            }
+        )
+
     @classmethod
     def new(cls, template_type: str) -> PrdMeta:
         return cls(type=template_type)
 
     def to_yaml(self) -> str:
         text: str = yaml.safe_dump(
-            {"type": self.type, "answers": self.answers},
+            {
+                "type": self.type,
+                "version": self.version,
+                "updated_at": self.updated_at,
+                "changelog": self.changelog,
+                "answers": self.answers,
+            },
             allow_unicode=True,
             sort_keys=False,
         )
@@ -111,10 +138,17 @@ class PrdMeta:
 
     @classmethod
     def from_yaml(cls, text: str) -> PrdMeta:
-        data = yaml.safe_load(text) or {}
+        data = yaml.safe_load(text)
+        if data is None:
+            return cls(type="", answers={})
+        if not isinstance(data, dict):
+            raise ValueError("meta.yaml 格式错误: 顶层应为映射")
         return cls(
             type=data.get("type", ""),
             answers=data.get("answers", {}) or {},
+            version=int(data.get("version", 1) or 1),
+            updated_at=data.get("updated_at", "") or "",
+            changelog=list(data.get("changelog", []) or []),
         )
 
 

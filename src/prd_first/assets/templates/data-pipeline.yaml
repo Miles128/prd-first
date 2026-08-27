@@ -1,0 +1,88 @@
+type: data-pipeline
+name: 数据流水线
+description: ETL/ELT、批处理、实时流、爬虫、数据清洗与建模任务。
+fields:
+  - key: problem
+    label: 问题陈述
+    required: true
+    type: text
+    prompt: "这条流水线解决什么数据问题?"
+    why: "先确认要解决的数据问题真实且边界清晰。"
+
+  - key: users
+    label: 数据消费者
+    required: true
+    type: text
+    prompt: "产出给谁用?(分析师/模型/下游系统)消费频率?"
+    why: "下游消费方式和频率决定产出格式。"
+
+  - key: goal
+    label: 成功定义
+    required: true
+    type: text
+    prompt: "怎样算成功?(数据质量指标/时效/覆盖度)"
+    why: "数据质量指标是流水线成败的度量。"
+
+  - key: sources
+    label: 数据源
+    required: true
+    type: list
+    prompt: "数据从哪来?(格式:来源 格式 更新频率)"
+    why: "数据源格式与频率决定解析与调度设计。"
+
+  - key: transforms
+    label: 转换逻辑
+    required: true
+    type: list
+    prompt: "要做哪些清洗/转换/聚合?"
+    why: "转换逻辑是流水线的核心业务价值。"
+
+  - key: output
+    label: 输出目标
+    required: true
+    type: text
+    prompt: "结果写到哪?(数仓/表/文件/消息队列)"
+    why: "输出目标决定与下游系统的对接方式。"
+
+  - key: schedule
+    label: 调度方式
+    required: true
+    type: single
+    choices: ["一次性", "定时批处理", "事件驱动/实时", "手动触发"]
+    prompt: "流水线何时运行?"
+    why: "调度方式影响幂等与容错设计。"
+
+  - key: quality
+    label: 质量校验
+    required: true
+    type: list
+    prompt: "有哪些数据质量门槛?(非空/唯一/范围/血缘)"
+    why: "质量门槛防止脏数据污染下游。"
+
+  - key: scope
+    label: MVP 范围
+    required: true
+    type: list
+    prompt: "第一版必须覆盖哪些链路?"
+    why: "MVP 范围决定第一版覆盖的数据链路。"
+
+  - key: non_goals
+    label: 非目标
+    required: true
+    type: list
+    prompt: "明确不做什么?"
+    why: "明确不处理哪些数据,防止范围蔓延。"
+
+  - key: tech_stack
+    label: 技术栈
+    required: true
+    type: text
+    prompt: "调度框架/计算引擎/存储用什么?"
+    why: "调度与计算引擎选择影响运维成本。"
+
+  - key: acceptance
+    label: 验收标准
+    required: true
+    type: list
+    prompt: "怎样验收?(含全量跑通、断点重跑、幂等验证)"
+    why: "含断点重跑和幂等验证的验收才可执行。"

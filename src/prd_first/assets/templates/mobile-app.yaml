@@ -1,0 +1,75 @@
+type: mobile-app
+name: 移动应用
+description: iOS/Android/跨端移动应用、移动端体验优先的产品。
+fields:
+  - key: problem
+    label: 问题陈述
+    required: true
+    type: text
+    prompt: "这个 App 解决什么问题?为什么必须是移动端?"
+    why: "先确认问题真实存在,且确实需要移动端场景。"
+
+  - key: users
+    label: 目标用户
+    required: true
+    type: text
+    prompt: "谁用?移动场景(通勤/碎片时间/户外)是怎样的?"
+    why: "使用场景(通勤/碎片时间)决定交互设计。"
+
+  - key: goal
+    label: 成功定义
+    required: true
+    type: text
+    prompt: "怎样算成功?给可验证标准(留存/日活/核心指标)。"
+    why: "没有可量化指标就无法判断上线是否成功。"
+
+  - key: platforms
+    label: 目标平台
+    required: true
+    type: single
+    choices: ["iOS", "Android", "双端原生", "跨端(Flutter/RN)", "移动 Web"]
+    prompt: "首发覆盖哪些平台?"
+    why: "平台选择决定技术方案和首发成本。"
+
+  - key: screens
+    label: 页面结构
+    required: true
+    type: list
+    prompt: "有哪些主要页面/导航结构?"
+    why: "页面结构是产品骨架,先锁骨架再谈细节。"
+
+  - key: offline
+    label: 离线能力
+    required: false
+    type: single
+    choices: ["必须离线可用", "弱网可用即可", "纯在线"]
+    prompt: "对离线/弱网的要求?"
+    why: "离线要求直接影响存储与同步架构。"
+
+  - key: scope
+    label: MVP 范围
+    required: true
+    type: list
+    prompt: "第一版必须有哪些功能?"
+    why: "MVP 范围决定第一版交付边界。"
+
+  - key: non_goals
+    label: 非目标
+    required: true
+    type: list
+    prompt: "明确不做什么?"
+    why: "明确不做什么,防止 scope creep。"
+
+  - key: tech_stack
+    label: 技术栈
+    required: true
+    type: text
+    prompt: "前端框架/状态管理/后端/推送/分析分别用什么?"
+    why: "技术栈决定开发效率和长期维护成本。"
+
+  - key: acceptance
+    label: 验收标准
+    required: true
+    type: list
+    prompt: "怎样验收?(含安装、性能、崩溃率)"
+    why: "验收标准是判断完成与否的唯一依据。"

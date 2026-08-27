@@ -1,0 +1,81 @@
+type: api-service
+name: API 服务
+description: REST/GraphQL/gRPC 后端服务、微服务、中间件、开放平台接口。
+fields:
+  - key: problem
+    label: 问题陈述
+    required: true
+    type: text
+    prompt: "这个服务解决什么问题?谁在消费它?"
+    why: "先确认服务存在的真实价值和调用场景。"
+
+  - key: users
+    label: 调用方
+    required: true
+    type: text
+    prompt: "谁调用?(内部业务/第三方开发者/前端)技术背景如何?"
+    why: "调用方背景决定契约设计与文档要求。"
+
+  - key: goal
+    label: 成功定义
+    required: true
+    type: text
+    prompt: "怎样算成功?(延迟/可用性/吞吐/调用量)"
+    why: "没有延迟/可用性指标就无法验收。"
+
+  - key: endpoints
+    label: 接口清单
+    required: true
+    type: list
+    prompt: "核心接口?(格式:方法 路径 说明)"
+    why: "接口契约是服务的核心交付物。"
+
+  - key: auth
+    label: 认证授权
+    required: true
+    type: single
+    choices: ["无认证", "API Key", "OAuth2/JWT", "内部服务间(mTLS)", "SSO"]
+    prompt: "用什么认证方式?"
+    why: "认证方式影响安全边界和集成成本。"
+
+  - key: data
+    label: 数据存储
+    required: true
+    type: text
+    prompt: "数据存哪?(DB/缓存/对象存储)一致性要求?"
+    why: "存储与一致性要求决定架构形态。"
+
+  - key: rate_limit
+    label: 限流与配额
+    required: false
+    type: text
+    prompt: "需要限流/配额吗?阈值多少?"
+    why: "限流策略影响可用性和成本控制。"
+
+  - key: scope
+    label: MVP 范围
+    required: true
+    type: list
+    prompt: "第一版必须有哪些接口/能力?"
+    why: "MVP 范围决定第一版接口集合。"
+
+  - key: non_goals
+    label: 非目标
+    required: true
+    type: list
+    prompt: "明确不做什么?"
+    why: "明确不做哪些能力,防止服务膨胀。"
+
+  - key: tech_stack
+    label: 技术栈
+    required: true
+    type: text
+    prompt: "语言/框架/部署/可观测性用什么?"
+    why: "技术栈决定性能基线与运维复杂度。"
+
+  - key: acceptance
+    label: 验收标准
+    required: true
+    type: list
+    prompt: "怎样验收?(含契约测试、压测指标、错误码规范)"
+    why: "含契约测试和压测指标的验收才可执行。"

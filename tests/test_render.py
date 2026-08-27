@@ -59,3 +59,27 @@ def test_render_bool():
     meta.set("ok", True)
     md = render_prd(template, meta)
     assert "是" in md
+
+
+class TestRenderVersion:
+    def test_render_includes_version(self, tmp_path):
+        from prd_first.models import PrdMeta, load_template
+
+        template = load_template("web-app")
+        meta = PrdMeta.new("web-app")
+        meta.bump("problem", None, "p")
+
+        md = render_prd(template, meta)
+        assert "版本: v2" in md
+        assert "## 变更记录" in md
+        assert "更新「problem」" in md
+
+    def test_render_no_changelog(self, tmp_path):
+        from prd_first.models import PrdMeta, load_template
+
+        template = load_template("web-app")
+        meta = PrdMeta.new("web-app")
+
+        md = render_prd(template, meta)
+        assert "版本: v1" in md
+        assert "## 变更记录" not in md

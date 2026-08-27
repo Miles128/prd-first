@@ -8,6 +8,7 @@ import typer
 import yaml
 
 from .const import (
+    DRILL_FILE_PREFIX,
     META_FILE_NAME,
     PRD_DIR_NAME,
     PRD_FILE_NAME,
@@ -78,6 +79,20 @@ def read_prd(root: Path | None = None) -> str | None:
     if not p.exists():
         return None
     return p.read_text(encoding="utf-8")
+
+
+def drill_file(topic: str, root: Path | None = None) -> Path:
+    """返回 drill 追问笔记文件路径。topic 会被规范化。"""
+    safe_topic = topic.lower().replace(" ", "-")
+    return prd_dir(root) / f"{DRILL_FILE_PREFIX}{safe_topic}.md"
+
+
+def save_drill(topic: str, content: str, root: Path | None = None) -> Path:
+    """写入 drill-<topic>.md。"""
+    ensure_prd_dir(root)
+    p = drill_file(topic, root)
+    p.write_text(content, encoding="utf-8")
+    return p
 
 
 def require_meta(root: Path | None = None) -> PrdMeta:

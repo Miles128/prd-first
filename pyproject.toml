@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "prd-first"
-version = "0.2.0"
+version = "0.3.0"
 description = "Vibecoding 前必须先写详尽 PRD 的工具:交互式问答生成结构化 PRD,配合 Skill 在 AI 编码前拦截。"
 readme = "README.md"
 requires-python = ">=3.10"
