@@ -47,3 +47,11 @@ def render_prd(template: TemplateDef, meta: PrdMeta) -> str:
         lines.append("")
 
     return "\n".join(lines)
+
+
+def render_section(template: TemplateDef, meta: PrdMeta, key: str) -> str:
+    """渲染单个字段小节。字段不存在时抛 KeyError。"""
+    field = template.find(key)
+    if field is None:
+        raise KeyError(key)
+    return _render_field(field, meta.get(key)).rstrip() + "\n"

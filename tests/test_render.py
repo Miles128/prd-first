@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import pytest
+
 from prd_first.models import PrdMeta, TemplateDef
-from prd_first.render import render_prd
+from prd_first.render import render_prd, render_section
 
 
 def _make_template(fields: list[dict]) -> TemplateDef:
@@ -61,6 +63,7 @@ def test_render_bool():
     assert "是" in md
 
 
+
 class TestRenderVersion:
     def test_render_includes_version(self, tmp_path):
         from prd_first.models import PrdMeta, load_template
@@ -83,3 +86,20 @@ class TestRenderVersion:
         md = render_prd(template, meta)
         assert "版本: v1" in md
         assert "## 变更记录" not in md
+
+
+
+def test_render_section():
+    template = _make_template([
+        {"key": "title", "label": "标题", "required": True, "type": "text"},
+        {"key": "body", "label": "正文", "required": True, "type": "text"},
+    ])
+    meta = PrdMeta.new("test")
+    meta.set("title", "Hello")
+    section = render_section(template, meta, "title")
+    assert "标题" in section
+    assert "Hello" in section
+    assert "正文" not in section
+    with pytest.raises(KeyError):
+        render_section(template, meta, "missing")
+
